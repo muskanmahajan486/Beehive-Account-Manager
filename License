@@ -704,6 +704,13 @@ OpenRemote Sub-components:
   GNU General Public License  Version 2 with Classpath Exception is used, 
   see license below.
 
+* The javax.annotation 1.2 API implementation from Glassfish project is
+  dual licensed under Common Development and Distribution License (CDDL)
+  Version 1.1 and GNU General Public License (GPL) Version 2 with a
+  Classpath Linking Exception. For the purpose of this distribution, the
+  GNU General Public License Version 2 with Classpath Exception is used,
+  see license below.
+
 * The javax.validation 1.1 API implementation from JBoss Hibernate is
   licensed under Apache License Version 2.0, see license below.
 
@@ -728,7 +735,7 @@ GNU Lesser General Public License (LGPL) v2.1 and GNU Lesser General Public Lice
 
 ------------------------------------------------------------------------------------------
 
-  JERSEY CLASSPATH EXCEPTION TO THE GPL VERSION 2
+  JERSEY 2.6 CLASSPATH EXCEPTION TO THE GPL VERSION 2
 
 ------------------------------------------------------------------------------------------
  
@@ -753,6 +760,35 @@ which is not derived from or based on this library.  If you modify this library,
 extend this exception to your version of the library, but you are not obligated to do so.  
 If you do not wish to do so, delete this exception statement from your version.
  
+
+------------------------------------------------------------------------------------------
+
+  JAVAX.ANNOTATIONS API 1.2 CLASSPATH EXCEPTION TO THE GPL VERSION 2
+
+------------------------------------------------------------------------------------------
+
+"CLASSPATH" EXCEPTION TO THE GPL VERSION 2
+
+Certain source files distributed by Sun Microsystems, Inc. are subject to the following 
+clarification and special exception to the GPL Version 2, but only where Sun has expressly 
+included in the particular source file's header the words "Sun designates this particular 
+file as subject to the "Classpath" exception as provided by Sun in the License file that 
+accompanied this code."
+
+Linking this library statically or dynamically with other modules is making a combined 
+work based on this library. Thus, the terms and conditions of the GNU General Public 
+License Version 2 cover the whole combination.
+
+As a special exception, the copyright holders of this library give you permission to link 
+this library with independent modules to produce an executable, regardless of the license 
+terms of these independent modules, and to copy and distribute the resulting executable 
+under terms of your choice, provided that you also meet, for each linked independent module, 
+the terms and conditions of the license of that module.? An independent module is a module 
+which is not derived from or based on this library.? If you modify this library, you may 
+extend this exception to your version of the library, but you are not obligated to do so.? 
+If you do not wish to do so, delete this exception statement from your version.
+
+
 
 ------------------------------------------------------------------------------------------
 
