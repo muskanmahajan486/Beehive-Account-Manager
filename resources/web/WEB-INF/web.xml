@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  OpenRemote, the Home of the Digital Home.
+  Copyright 2008-2014, OpenRemote Inc.
+
+  See the contributors.txt file in the distribution for a full listing
+  of individual contributors.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation; either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public
+  License along with this program; if not, see
+  http://www.gnu.org/licenses/.
+-->
+
+
+<!--
+
+  Servlet / Web Archive definition for OpenRemote Beehive account management.
+
+  The servlets in this web archive implement a REST API for managing Beehive accounts, as
+  defined in Beehive Account Management (BHVE03) design document.
+
+  The servlet / REST API implementation is built using JAX-RS 2.0 API specification and
+  corresponding implementation. Therefore only a JAX-RS application servlet is defined
+  in this WAR definition.
+
+  The current definition is made against Servlet API specification version 2.5.
+
+  Author: Juha Lindfors
+
+-->
+<web-app version = "2.5"
+         xmlns = "http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation = "http://java.sun.com/xml/ns/javaee
+         http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+  <display-name>OpenRemote Beehive Account Manager</display-name>
+
+
+  <!--
+  =================================================================================================
+
+    Map servlet Java class implementations to URLs.
+
+    This mapping links the JAX-RS 2.0 implementation to Glassfish Jersey based implementation
+    of the API.
+
+  =================================================================================================
+  -->
+
+
+  <servlet>
+    <servlet-name>Jersey Servlet Container for Beehive Account Manager</servlet-name>
+
+    <!-- Jersey implementation -->
+
+    <servlet-class>
+      org.glassfish.jersey.servlet.ServletContainer
+    </servlet-class>
+
+    <!-- JAX-RS 2.0 configuration to link JAX-RS application -->
+
+    <init-param>
+      <param-name>javax.ws.rs.Application</param-name>
+      <param-value>org.openremote.beehive.account.AccountManager</param-value>
+    </init-param>
+
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+
+  <!--
+
+       URL Mapping:
+
+       As per the Beehive REST API design convention, all REST API calls start with '/rest' path.
+       The following '/rpc' path indicates the REST API design style (RPC vs HATEOAS) followed
+       by service name path '/accountmanager' and service API version path '/2/0/0'.
+
+       Therefore a deployment URL might be:
+
+       https://beehive.openremote.org/rest/rpc/accountmanager/2/0/0/[resource-path]
+
+       Note that this configuration overrides the ApplicationPath annotation in JAX-RS
+       application implementation.
+
+  -->
+  <servlet-mapping>
+    <servlet-name>Jersey Servlet Container for Beehive Account Manager</servlet-name>
+    <url-pattern>/rest/rpc/accountmanager/2/0/0/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>
