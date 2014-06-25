@@ -704,15 +704,18 @@ OpenRemote Sub-components:
   GNU General Public License  Version 2 with Classpath Exception is used, 
   see license below.
 
-* The javax.annotation 1.2 API implementation and javax.ws.rs 2.0 API
-  implementation from Glassfish project are dual licensed under Common 
-  Development and Distribution License (CDDL) Version 1.1 and GNU General 
-  Public License (GPL) Version 2 with a Classpath Linking Exception. For 
-  the purpose of this distribution, the GNU General Public License 
-  Version 2 with Classpath Exception is used, see license below.
+* The javax.annotation 1.2 API (JSR-250) implementation and javax.ws.rs 2.0 
+  API (JSR-336) implementation from Glassfish project are dual licensed 
+  under Common Development and Distribution License (CDDL) Version 1.1 and 
+  GNU General Public License (GPL) Version 2 with a Classpath Linking 
+  Exception. For the purpose of this distribution, the GNU General Public 
+  License Version 2 with Classpath Exception is used, see license below.
 
-* The javax.validation 1.1 API implementation from JBoss Hibernate is
-  licensed under Apache License Version 2.0, see license below.
+* The javax.validation 1.1 API (JSR-349) implementation from JBoss Hibernate 
+  is licensed under Apache License Version 2.0, see license below.
+
+* The javax.inject 1.0 API (JSR-330) implementation from Google is licensed
+  under Apache License Version 2.0, see license below.
 
 
 ##########################################################################################
@@ -735,7 +738,7 @@ GNU Lesser General Public License (LGPL) v2.1 and GNU Lesser General Public Lice
 
 ------------------------------------------------------------------------------------------
 
-  JERSEY 2.6 CLASSPATH EXCEPTION TO THE GPL VERSION 2
+  JERSEY 2.6, JAVAX.WS.RS API 2.0 CLASSPATH EXCEPTION TO THE GPL VERSION 2
 
 ------------------------------------------------------------------------------------------
  
