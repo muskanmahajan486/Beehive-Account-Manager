@@ -126,6 +126,60 @@
   </description>
 
 
+  <!--
+   | PACKAGE:
+   |
+   | Creates a web archive (both compressed and expanded) of the Beehive account manager
+   | application for servlet container deployment.
+   +-->
+  <target name = "package" extensionOf = "-after-unit-test" depends = "compile">
+
+    <property name = "war.name" value = "BeehiveAccountManager"/>
+
+    <echo message="--------------------------------------------------------------------"/>
+    <echo message=" Packaging ${war.name}-${release.version}..."/>
+    <echo message="--------------------------------------------------------------------"/>
+    <echo message=""/>
+
+
+    <!--
+         Copy the preconfigured web directory as expanded dir structure to output. Old files
+         will be overwritten...
+    -->
+
+    <copy todir = "${output.dir}/${war.name}-${release.version}" overwrite = "true">
+      <fileset dir = "resources/web"/>
+    </copy>
+
+    <!-- Copy compiled classes into the WEB-INF/classes hierarchy... -->
+
+    <copy todir = "${output.dir}/${war.name}-${release.version}/WEB-INF/classes" overwrite = "true">
+      <fileset dir = "${classes.dir}"/>
+    </copy>
+
+    <!-- Copy all runtime libs as flattened archive structure into WEB-INF/lib... -->
+
+    <copy todir = "${output.dir}/${war.name}-${release.version}/WEB-INF/lib"
+          flatten = "true"
+          overwrite = "true">
+
+      <fileset dir = "${lib.dir}">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
+    </copy>
+
+    <!-- Create a compressed Web Archive... -->
+
+    <zip basedir = "${output.dir}/${war.name}-${release.version}"
+         destfile = "${output.dir}/${war.name}-${release.version}.war" whenempty="fail">
+    </zip>
+
+  </target>
+
+
+
   <!-- ========================================================= -->
   <!--  PATH DEFINITIONS.                                        -->
   <!-- ========================================================= -->
