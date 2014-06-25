@@ -697,11 +697,11 @@ OpenRemote Sub-components:
   purpose of this distribution, the Javassist 3.18.1 library is re-licensed
   under GNU Lesser General Public License Version 3.0.
 
-* Jersey Core 2.6 and Jersey Servlet Container 2.6 libraries are dual 
-  licensed under Common Development and Distribution License (CDDL) 
-  Version 1.1 and GNU General Public License (GPL) Version 2 with a 
-  Classpath Linking Exception. For the purpose of this distribution, the 
-  GNU General Public License  Version 2 with Classpath Exception is used, 
+* Jersey Core 2.6, Jersey Servlet Container 2.6 and Jersey Bundle 2.6
+  libraries are dual licensed under Common Development and Distribution 
+  License (CDDL) Version 1.1 and GNU General Public License (GPL) Version 2 
+  with a Classpath Linking Exception. For the purpose of this distribution, 
+  the GNU General Public License  Version 2 with Classpath Exception is used, 
   see license below.
 
 * The javax.annotation 1.2 API (JSR-250) implementation and javax.ws.rs 2.0 
