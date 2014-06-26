@@ -38,6 +38,21 @@ import java.util.Set;
 public class AccountManager extends Application
 {
 
+  // Constants ------------------------------------------------------------------------------------
+
+  /**
+   * The security role name defined for service administrator access in web deployment
+   * descriptor: {@value}
+   */
+  public static final String SERVICE_ADMINISTRATOR_ROLE = "service-admin";
+
+  /**
+   * The security role name defined for account owner in web deployment descriptor: {@value}
+   */
+  public static final String ACCOUNT_OWNER_ROLE = "account-owner";
+
+
+
   // Application Overrides ------------------------------------------------------------------------
 
   @Override public Set<Class<?>> getClasses()
