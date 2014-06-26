@@ -151,7 +151,7 @@
     </auth-constraint>
 
 
-    <!-- Enforce HTTPS access...
+    <!-- Enforce HTTPS access... -->
 
     <user-data-constraint>
 
@@ -163,8 +163,6 @@
       <transport-guarantee>CONFIDENTIAL</transport-guarantee>
 
     </user-data-constraint>
-    
-    -->
 
   </security-constraint>
 
