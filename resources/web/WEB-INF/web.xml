@@ -73,7 +73,7 @@
 
     <init-param>
       <param-name>javax.ws.rs.Application</param-name>
-      <param-value>org.openremote.beehive.account.AccountManager</param-value>
+      <param-value>org.openremote.beehive.account.service.AccountManager</param-value>
     </init-param>
 
     <load-on-startup>1</load-on-startup>
@@ -92,10 +92,8 @@
 
        https://beehive.openremote.org/rest/rpc/accountmanager/2/0/0/[resource-path]
 
-       Note that this configuration overrides the ApplicationPath annotation in JAX-RS
-       application implementation.
-
   -->
+
   <servlet-mapping>
     <servlet-name>Jersey Servlet Container for Beehive Account Manager</servlet-name>
     <url-pattern>/rest/rpc/accountmanager/2/0/0/*</url-pattern>
