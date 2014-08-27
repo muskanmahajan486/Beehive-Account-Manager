@@ -196,6 +196,73 @@
          destfile = "${output.dir}/${war.name}-${release.version}.war" whenempty="fail">
     </zip>
 
+
+    <!-- Create a compressed Client Archive... -->
+
+    <zip basedir = "${output.dir}/client/classes"
+         destfile = "${output.dir}/client/BeehiveAccountClient-${release.version}.jar" whenempty="fail">
+    </zip>
+
+
+    <!-- Copy client libs as flattened archive structure client/lib... -->
+
+    <copy todir = "${output.dir}/client/lib"
+          flatten = "true"
+          overwrite = "true">
+
+      <fileset dir = "${lib.dir}/openremote-security-0.3.0">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
+      <fileset dir = "${lib.dir}/openremote-logging-0.1.0">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
+      <fileset dir = "${lib.dir}/openremote-object-model-0.2.0">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
+      <fileset dir = "${lib.dir}/bouncycastle-1.5.0">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
+      <fileset dir = "${lib.dir}/javassist-3.18.1">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
+      <fileset dir = "${lib.dir}/hk2-2.2.0">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
+      <fileset dir = "${lib.dir}/javax.inject-1.0">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
+      <fileset dir = "${lib.dir}/javax.ws.rs-2.0">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
+      <fileset dir = "${lib.dir}/jersey-bundles-2.6">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
+      <fileset dir = "${lib.dir}/jersey-core-2.6">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*|jersey-server*"/>
+      </fileset>
+
+    </copy>
+
+
   </target>
 
 
