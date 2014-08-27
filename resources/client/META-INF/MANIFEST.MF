@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Created-By: OpenRemote, Inc.
+Name: openremote-beehive-account-client
+Specification-Title: OpenRemote Beehive Account Client
+Specification-Version: ${api.version}
+Specification-Vendor: OpenRemote, Inc.
+Implementation-Title: OpenRemote Beehive Account Client REST API
+Implementation-Version: ${release.version}
+Implementation-Vendor: OpenRemote, Inc.
+Main-Class: org.openremote.beehive.account.client.AccountManagerClient
