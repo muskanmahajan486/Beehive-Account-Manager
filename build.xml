@@ -154,8 +154,28 @@
     <!-- Copy compiled classes into the WEB-INF/classes hierarchy... -->
 
     <copy todir = "${output.dir}/${war.name}-${release.version}/WEB-INF/classes" overwrite = "true">
-      <fileset dir = "${classes.dir}"/>
+      <fileset dir = "${classes.dir}">
+        <exclude name = "org/openremote/beehive/account/client/**"/>
+      </fileset>
     </copy>
+
+
+    <!-- Copy client classes into client classes hierarchy... -->
+
+    <copy todir = "${output.dir}/client/classes" overwrite = "true">
+      <fileset dir = "${classes.dir}">
+        <include name = "org/openremote/beehive/account/client/**"/>
+      </fileset>
+    </copy>
+
+    <copy todir = "${output.dir}/client/classes/META-INF"
+           file = "${resources.dir}/client/META-INF/MANIFEST.MF">
+       <filterchain>
+         <expandproperties/>
+       </filterchain>
+     </copy>
+
+
 
     <!-- Copy all runtime libs as flattened archive structure into WEB-INF/lib... -->
 
