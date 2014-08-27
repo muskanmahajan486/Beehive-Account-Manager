@@ -22,10 +22,10 @@
 #  --------------------------------------------------------------------
 #
 ##
-#  This is a convenience script to run client-side related utilities
-#  for Beehive Account Manager service.
+#  This is a convenience script to run client-side utilities
+#  for Beehive Account service.
 #
-#    > sh project.sh --help
+#    > sh beehive-account-client.sh --help
 #
 #  to view usage details.
 #
