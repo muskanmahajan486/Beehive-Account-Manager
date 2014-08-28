@@ -204,6 +204,17 @@
     </zip>
 
 
+    <!-- Copy client script... -->
+
+    <copy todir = "${output.dir}/client"
+          overwrite = "true">
+
+      <fileset dir = "${resources.dir}/client">
+        <include name = "**/*.sh"/>
+      </fileset>
+    </copy>
+
+
     <!-- Copy client libs as flattened archive structure client/lib... -->
 
     <copy todir = "${output.dir}/client/lib"
