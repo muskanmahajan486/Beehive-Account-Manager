@@ -53,7 +53,7 @@ function printHelp()
   echo "           ensure deployment works correctly.";
   echo "";
   echo "";
-  echo "    sh beehive-account-client.sh --generate-keys";
+  echo "    sh beehive-account-client.sh --generate-keys <passwd> [-alias <alias>]";
   echo "";
   echo "         - Creates a new self-signed key pair and appropriate";
   echo "           Tomcat private key store and client trusted";
