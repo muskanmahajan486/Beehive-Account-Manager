@@ -78,7 +78,7 @@ fi
 # OpenRemote libs.
 CLASSPATH=BeehiveAccountClient-2.0.0.jar
 CLASSPATH="$CLASSPATH:lib/openremote-object-model-0.2.0_WIP.jar"
-CLASSPATH="$CLASSPATH:lib/openremote-security-0.3.0_WIP.jar"
+CLASSPATH="$CLASSPATH:lib/openremote-security-0.3.0.jar"
 
 # BouncyCastle libs for OpenRemote security.
 CLASSPATH="$CLASSPATH:lib/bcprov-jdk15on-150.jar"
