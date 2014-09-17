@@ -47,7 +47,11 @@ public class AccountManagerClientTest
 
   private static final String ADMIN_USERNAME = "admin";
 
+  private static final String DEFAULT_USERNAME = "user";
+
   private static final byte[] ADMIN_CREDENTIALS = "admin".getBytes();
+
+  private static final byte[] USER_CREDENTIALS = "user".getBytes();
 
   private static final URL DEFAULT_SERVICE_ROOT;
 
@@ -58,7 +62,11 @@ public class AccountManagerClientTest
   {
     try
     {
-      DEFAULT_SERVICE_ROOT = new URL("https://localhost:12123/test");
+      DEFAULT_SERVICE_ROOT = new URL(
+          "https://localhost:" +
+          Tomcat.DEFAULT_SECURE_CONNECTOR_PORT +
+          Tomcat.DEFAULT_WEBAPP_CONTEXT
+      );
     }
 
     catch (Throwable throwable)
@@ -71,6 +79,7 @@ public class AccountManagerClientTest
 
       throw new Error(msg);
     }
+
   }
 
 
@@ -79,16 +88,33 @@ public class AccountManagerClientTest
 
   private Tomcat tomcat;
 
+  private AccountManagerClient defaultAdminClient = new AccountManagerClient(
+      DEFAULT_SERVICE_ROOT,
+      ADMIN_USERNAME,
+      ADMIN_CREDENTIALS
+  );
+
+  private AccountManagerClient defaultUserClient = new AccountManagerClient(
+      DEFAULT_SERVICE_ROOT,
+      DEFAULT_USERNAME,
+      USER_CREDENTIALS
+  );
+
+
   @BeforeClass public void installBouncyCastleProvider()
   {
     Security.addProvider(SecurityProvider.BC.getProviderInstance());
   }
 
-  @BeforeClass public void startTomcat()
+  @BeforeClass public void startTomcatAndInitializeClients()
   {
     try
     {
       tomcat = new Tomcat();
+
+      defaultAdminClient.createTemporaryCertificateTrustStore(tomcat.getHttpsCertificate());
+      defaultUserClient.createTemporaryCertificateTrustStore(tomcat.getHttpsCertificate());
+
       tomcat.start();
     }
 
@@ -123,16 +149,9 @@ public class AccountManagerClientTest
 
   // Tests ----------------------------------------------------------------------------------------
 
-  @Test public void testCreateUser() throws Exception
+  @Test public void testAdminCreateUser() throws Exception
   {
-    PrivateKeyManager privatekey = PrivateKeyManager.create(KeyManager.Storage.JCEKS);
-    Certificate keyCertificate = privatekey.addKey("tomcat", "tomcat".toCharArray());
-
-    AccountManagerClient client = new AccountManagerClient(
-        DEFAULT_SERVICE_ROOT, ADMIN_USERNAME, ADMIN_CREDENTIALS
-    ).createTemporaryCertificateTrustStore(keyCertificate);
-
-    Response response = client.createUserAccount("newuser", "newcredentials".getBytes());
+    Response response = defaultAdminClient.createUserAccount("newuser", "newcredentials".getBytes());
 
     Assert.assertTrue(
         response.getStatus() == Response.Status.OK.getStatusCode(),
@@ -140,15 +159,24 @@ public class AccountManagerClientTest
     );
   }
 
+  @Test public void testCreateUser() throws Exception
+  {
+    Response response = defaultUserClient.createUserAccount("newuser", "newcredentials".getBytes());
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.FORBIDDEN.getStatusCode(),
+        "Got " + response.getStatus()
+    );
+  }
+
 
   @Test public void testCreateUserWrongAuthenticationCredentials() throws Exception
   {
-    PrivateKeyManager privatekey = PrivateKeyManager.create(KeyManager.Storage.JCEKS);
-    Certificate keyCertificate = privatekey.addKey("tomcat", "tomcat".toCharArray());
-
     AccountManagerClient client = new AccountManagerClient(
         DEFAULT_SERVICE_ROOT, ADMIN_USERNAME, "INCORRECT_ADMIN_PASSWORD".getBytes()
-    ).createTemporaryCertificateTrustStore(keyCertificate);
+    );
+
+    client.createTemporaryCertificateTrustStore(tomcat.getHttpsCertificate());
 
     Response response = client.createUserAccount("newuser", "newcredentials".getBytes());
 
@@ -157,5 +185,44 @@ public class AccountManagerClientTest
         "Got " + response.getStatus()
     );
   }
+
+  @Test public void testAdminDeleteUser() throws Exception
+  {
+    Response response = defaultAdminClient.delete("user");
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.OK.getStatusCode(),
+        "Got " + response.getStatus()
+    );
+  }
+
+
+  @Test public void testDeleteUser() throws Exception
+  {
+    Response response = defaultUserClient.delete("user");
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.FORBIDDEN.getStatusCode(),
+        "Got " + response.getStatus()
+    );
+  }
+
+  @Test public void testDeleteUserWrongAuthenticationCredentials() throws Exception
+  {
+    AccountManagerClient client = new AccountManagerClient(
+        DEFAULT_SERVICE_ROOT, ADMIN_USERNAME, "INCORRECT_ADMIN_PASSWORD".getBytes()
+    );
+
+    client.createTemporaryCertificateTrustStore(tomcat.getHttpsCertificate());
+
+    Response response = client.delete("newuser");
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode(),
+        "Got " + response.getStatus()
+    );
+  }
+
+
 }
 
