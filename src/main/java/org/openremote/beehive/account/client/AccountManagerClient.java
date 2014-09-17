@@ -37,16 +37,13 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.Security;
 import java.security.cert.Certificate;
 
@@ -258,10 +255,8 @@ public class AccountManagerClient
 
     // Create store and add a new private key...
 
-    // TODO : check Tomcat config for storage formats other than JKS
-
     PrivateKeyManager privatekey = PrivateKeyManager.create(
-        privateKeyStoreLocation, storePassword, KeyManager.Storage.JKS
+        privateKeyStoreLocation, storePassword, KeyManager.Storage.JCEKS
     );
 
     System.out.println();
@@ -280,11 +275,13 @@ public class AccountManagerClient
 
   private URL serviceRootURL;
 
-  private KeyStore certificateTrustStore = null;
-
   private byte[] credentials;
 
   private String username;
+
+
+  private URI trustStoreLocation;
+
 
 
   // Constructors ---------------------------------------------------------------------------------
@@ -344,6 +341,46 @@ public class AccountManagerClient
 
     return sendDelete(target);
   }
+
+
+
+  public AccountManagerClient createCertificateTrustStore(URI storeLocation, Certificate cert)
+      throws InitializationException
+  {
+    // TODO
+
+    try
+    {
+      TrustStore trustStore = TrustStore.create(storeLocation, KeyManager.Storage.JCEKS);
+      trustStore.addTrustedCertificate("single-certificate-store", cert);
+
+      this.trustStoreLocation = storeLocation;
+    }
+
+    catch (Exception exception)
+    {
+      throw new InitializationException(
+          "Creating client''s certificate trust store failed : {0}",
+          exception, exception.getMessage()
+      );
+    }
+
+    return this;
+  }
+
+
+
+  public AccountManagerClient createTemporaryCertificateTrustStore(Certificate cert)
+      throws InitializationException
+  {
+    File workDir = new File(System.getProperty("user.dir"));
+    File temp = new File(workDir, "cert.truststore");
+
+    temp.deleteOnExit();
+
+    return createCertificateTrustStore(temp.toURI(), cert);
+  }
+
 
 
 
@@ -432,6 +469,41 @@ public class AccountManagerClient
 
 
 
+
+  private Client createClient()
+  {
+    //System.setProperty("javax.net.debug", "all");
+    //System.setProperty("javax.net.ssl.trustStore", "/Users/juha/testTrustStore");
+
+    ClientBuilder builder = ClientBuilder.newBuilder().hostnameVerifier(new HostnameVerifier()
+    {
+      public boolean verify(String s, SSLSession sslSession)
+      {
+        // TODO
+
+        return true;  //To change body of implemented methods use File | Settings | File Templates.
+      }
+    });
+
+    try
+    {
+      KeyStore keystore = KeyStore.getInstance(DEFAULT_TRUST_STORE_FORMAT.getStorageName());
+      FileInputStream fis = new FileInputStream(new File(trustStoreLocation));
+
+      keystore.load(fis, KeyManager.EMPTY_KEY_PASSWORD);
+
+      builder = builder.trustStore(keystore);
+
+    }
+
+    catch (Throwable t)
+    {
+      t.printStackTrace();
+    }
+
+
+    return builder.build();
+  }
 
 
   // Nested Classes -------------------------------------------------------------------------------
