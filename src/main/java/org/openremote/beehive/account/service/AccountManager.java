@@ -20,7 +20,16 @@
  */
 package org.openremote.beehive.account.service;
 
+import javax.servlet.ServletConfig;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,26 +40,30 @@ import java.util.Set;
  * features that compose the account manager service. <p>
  *
  * This implementation uses the explicit resource registration via {@link #getClasses()} method
- * to support pre-Servlet 3.0 containers.
+ * to support pre-Servlet 3.0 containers. It currently assumes a servlet container-based
+ * deployment.
  *
  * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
  */
 public class AccountManager extends Application
 {
 
-  // Constants ------------------------------------------------------------------------------------
 
-  /**
-   * The security role name defined for service administrator access in web deployment
-   * descriptor: {@value}
-   */
-  public static final String SERVICE_ADMINISTRATOR_ROLE = "service-admin";
 
   /**
    * The security role name defined for account owner in web deployment descriptor: {@value}
    */
   public static final String ACCOUNT_OWNER_ROLE = "account-owner";
 
+
+
+
+  // Constructors ---------------------------------------------------------------------------------
+
+  public AccountManager()
+  {
+    //System.setProperty("jersey.config.server.tracing.type", "ALL");
+  }
 
 
   // Application Overrides ------------------------------------------------------------------------
