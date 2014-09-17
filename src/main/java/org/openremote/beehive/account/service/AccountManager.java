@@ -90,5 +90,87 @@ public class AccountManager extends Application
 
     return classes;
   }
+
+
+  // Nested Classes -------------------------------------------------------------------------------
+
+  /**
+   * Implements user authorization as a dynamic feature. This allows authorization configuration
+   * to be made available through servlet's deployment descriptor.
+   *
+   * TODO :
+   *   implement user role to resource mapping
+   */
+  public static class UserAuthorization implements DynamicFeature
+  {
+    @Override public void configure(ResourceInfo info, FeatureContext ctx)
+    {
+      if (info.getResourceClass().equals(UserAccount.class))
+      {
+        ctx.register(new AuthorizationRole(Role.ACCOUNT_OWNER_ROLE, Role.SERVICE_ADMINISTRATOR_ROLE));
+      }
+      else if (info.getResourceClass().equals(CreateAccount.class))
+      {
+        ctx.register(new AuthorizationRole(Role.SERVICE_ADMINISTRATOR_ROLE));
+      }
+
+      else if (info.getResourceClass().equals(DeleteAccount.class))
+      {
+        ctx.register(new AuthorizationRole(Role.SERVICE_ADMINISTRATOR_ROLE));
+      }
+    }
+  }
+
+  /**
+   * A basic request authorization filter for incoming requests.
+   */
+  public static class AuthorizationRole implements ContainerRequestFilter
+  {
+
+    private Role[] roles;
+
+    private AuthorizationRole(Role... roles)
+    {
+      this.roles = roles;
+    }
+
+    @Override public void filter(ContainerRequestContext ctx)
+    {
+      SecurityContext security = ctx.getSecurityContext();
+
+      for (Role role : roles)
+      {
+        if (security.isUserInRole(role.getWebDescriptorRoleName()))
+          return;
+      }
+
+      ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+    }
+  }
+
+  private enum Role
+  {
+    SERVICE_ADMINISTRATOR_ROLE("service-admin"),
+
+    ACCOUNT_OWNER_ROLE("account-owner");
+
+
+    private String rolename;
+
+    private Role(String rolename)
+    {
+      this.rolename = rolename;
+    }
+
+    public String getWebDescriptorRoleName()
+    {
+      return rolename;
+    }
+
+    @Override public String toString()
+    {
+      return getWebDescriptorRoleName();
+    }
+  }
 }
 
