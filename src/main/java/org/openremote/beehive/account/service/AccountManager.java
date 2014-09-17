@@ -50,10 +50,23 @@ public class AccountManager extends Application
 
 
 
-  /**
-   * The security role name defined for account owner in web deployment descriptor: {@value}
-   */
-  public static final String ACCOUNT_OWNER_ROLE = "account-owner";
+  // Class Members --------------------------------------------------------------------------------
+
+  private static final Set<Class<?>> resourceClasses = new HashSet<Class<?>>(5);
+
+  static
+  {
+    resourceClasses.add(CreateAccount.class);
+    resourceClasses.add(DeleteAccount.class);
+    resourceClasses.add(UserAccount.class);
+  }
+
+  private static final Set<Class<?>> providerClasses = new HashSet<Class<?>>();
+
+  static
+  {
+    providerClasses.add(UserAuthorization.class);
+  }
 
 
 
@@ -72,9 +85,8 @@ public class AccountManager extends Application
   {
     Set<Class<?>> classes = new HashSet<Class<?>>();
 
-    classes.add(CreateAccount.class);
-    classes.add(DeleteAccount.class);
-    classes.add(UserAccount.class);
+    classes.addAll(resourceClasses);
+    classes.addAll(providerClasses);
 
     return classes;
   }
