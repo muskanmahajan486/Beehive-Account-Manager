@@ -139,6 +139,11 @@ public class AccountManagerClient
         password.getBytes()
     );
 
+    File userHomeDir = new File(System.getProperty("user.home"));
+    File trustStoreLocation = new File(userHomeDir, "client.truststore");
+
+    client.setCertificateTrustStore(trustStoreLocation.toURI());
+
     System.out.println("");
     System.out.println("");
 
