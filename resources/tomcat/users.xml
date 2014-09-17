@@ -17,10 +17,10 @@
 -->
 <tomcat-users>
   
-  <role rolename="account-owner"/>
-  <role rolename="service-admin"/>
+  <role rolename = "account-owner"/>
+  <role rolename = "service-admin"/>
 
-  <user username="tomcat" password="tomcat" roles="service-admin,account-owner"/>
-  <user username="user" password="user" roles="account-owner"/>
+  <user username = "admin" password = "admin" roles = "service-admin,account-owner"/>
+  <user username = "user" password = "user" roles = "account-owner"/>
 
 </tomcat-users>
