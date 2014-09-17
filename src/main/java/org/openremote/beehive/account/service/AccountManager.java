@@ -144,7 +144,7 @@ public class AccountManager extends Application
           return;
       }
 
-      ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+      ctx.abortWith(Response.status(Response.Status.FORBIDDEN).build());
     }
   }
 
