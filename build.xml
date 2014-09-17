@@ -126,6 +126,34 @@
   </description>
 
 
+  <target name = "-unit-test-web-archive" extensionOf = "-before-unit-test" depends = "compile">
+
+    <!-- Delete old archives first... -->
+
+    <delete dir = "${build.dir}/webapps"/>
+
+
+    <!--
+         Copy the preconfigured web directory as expanded dir structure to build/webapps for
+         unit testing...
+    -->
+
+    <copy todir = "${build.dir}/webapps/service" overwrite = "true">
+      <fileset dir = "resources/web"/>
+    </copy>
+
+    <!-- Copy compiled classes into the WEB-INF/classes hierarchy... -->
+
+    <copy todir = "${build.dir}/webapps/service/WEB-INF/classes" overwrite = "true">
+      <fileset dir = "${classes.dir}">
+        <exclude name = "org/openremote/beehive/account/client/**"/>
+      </fileset>
+    </copy>
+
+
+  </target>
+
+
   <!--
    | PACKAGE:
    |
