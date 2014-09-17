@@ -344,6 +344,13 @@ public class AccountManagerClient
 
 
 
+  public AccountManagerClient setCertificateTrustStore(URI storeLocation)
+  {
+    this.trustStoreLocation = storeLocation;
+
+    return this;
+  }
+
   public AccountManagerClient createCertificateTrustStore(URI storeLocation, Certificate cert)
       throws InitializationException
   {
@@ -354,7 +361,7 @@ public class AccountManagerClient
       TrustStore trustStore = TrustStore.create(storeLocation, KeyManager.Storage.JCEKS);
       trustStore.addTrustedCertificate("single-certificate-store", cert);
 
-      this.trustStoreLocation = storeLocation;
+      setCertificateTrustStore(storeLocation);
     }
 
     catch (Exception exception)
