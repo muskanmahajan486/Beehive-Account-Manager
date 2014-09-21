@@ -21,6 +21,7 @@
 package org.openremote.beehive.account.client;
 
 import org.openremote.beehive.Tomcat;
+import org.openremote.beehive.account.model.UserRegistration;
 import org.openremote.security.KeyManager;
 import org.openremote.security.PrivateKeyManager;
 import org.openremote.security.SecurityProvider;
@@ -151,7 +152,9 @@ public class AccountManagerClientTest
 
   @Test public void testAdminCreateUser() throws Exception
   {
-    Response response = defaultAdminClient.createUserAccount("newuser", "newcredentials".getBytes());
+    Response response = defaultAdminClient.create(
+        new UserRegistration("newuser", null, "newcredentials".getBytes())
+    );
 
     Assert.assertTrue(
         response.getStatus() == Response.Status.OK.getStatusCode(),
@@ -161,7 +164,9 @@ public class AccountManagerClientTest
 
   @Test public void testCreateUser() throws Exception
   {
-    Response response = defaultUserClient.createUserAccount("newuser", "newcredentials".getBytes());
+    Response response = defaultUserClient.create(
+        new UserRegistration("newuser", null, "newcredentials".getBytes())
+    );
 
     Assert.assertTrue(
         response.getStatus() == Response.Status.FORBIDDEN.getStatusCode(),
@@ -178,7 +183,9 @@ public class AccountManagerClientTest
 
     client.createTemporaryCertificateTrustStore(tomcat.getHttpsCertificate());
 
-    Response response = client.createUserAccount("newuser", "newcredentials".getBytes());
+    Response response = client.create(
+        new UserRegistration("newuser", null, "newcredentials".getBytes())
+    );
 
     Assert.assertTrue(
         response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode(),
