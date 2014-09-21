@@ -23,6 +23,7 @@ package org.openremote.beehive.account.client;
 import org.bouncycastle.util.encoders.Base64;
 import org.openremote.base.Version;
 import org.openremote.base.exception.InitializationException;
+import org.openremote.beehive.account.model.UserRegistration;
 import org.openremote.security.KeyManager;
 import org.openremote.security.PrivateKeyManager;
 import org.openremote.security.SecurityProvider;
@@ -155,7 +156,9 @@ public class AccountManagerClient
     System.out.println("Creating new user account for " + user);
     System.out.println();
 
-    Response response = client.createUserAccount(user, "Smb9324$#@#@$".getBytes());
+    Response response = client.create(
+        new UserRegistration(user, null, "Smb9324$#@#@$".getBytes())
+    );
 
     System.out.println(response.getStatus() + ": " + response.getStatusInfo());
 
@@ -284,7 +287,6 @@ public class AccountManagerClient
 
   private String username;
 
-
   private URI trustStoreLocation;
 
 
@@ -305,28 +307,11 @@ public class AccountManagerClient
   // Public Instance Methods ----------------------------------------------------------------------
 
 
-  public Response createUserAccount(String username, byte[] credentials) throws Exception
+  public Response create(UserRegistration user) throws Exception
   {
     WebTarget target = constructTargetBase(createClient()).path("users");
 
-    // TODO : the json will be part of the object model
-
-    Entity<String> jsonEntity = Entity.entity(
-        "{ " +
-        "  \"libraryName\" : \"OpenRemote Object Model\", " +
-        "  \"javaFullClassName\" : \"org.openremote.model.NewUser\", " +
-        "  \"schemaVersion\" : \"2.0\", " +
-        "  \"apiVersion\" : \"2.0.0\", " +
-        "" +
-        "  \"model\"" +
-        "  {" +
-        "     \"username\": \"" + username +"\", " +
-        "     \"credentials\": \"" + new String(credentials) + "\"" +
-        "  }"+
-        "}",
-
-        MediaType.APPLICATION_JSON
-    );
+    Entity<String> jsonEntity = Entity.entity(user.toJSONString(), MediaType.APPLICATION_JSON);
 
     return sendPost(target, jsonEntity);
   }
