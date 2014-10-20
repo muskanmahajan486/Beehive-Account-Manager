@@ -48,6 +48,9 @@ import java.util.Set;
 public class AccountManager extends Application
 {
 
+  // Constants ------------------------------------------------------------------------------------
+
+  public static final String ENTITY_MANAGER_LOOKUP = "EntityManager";
 
 
   // Class Members --------------------------------------------------------------------------------
@@ -66,8 +69,9 @@ public class AccountManager extends Application
   static
   {
     providerClasses.add(UserAuthorization.class);
+    providerClasses.add(EntityPersistence.class);
+    providerClasses.add(UserRegistrationReader.class);
   }
-
 
 
 
@@ -76,7 +80,9 @@ public class AccountManager extends Application
   public AccountManager()
   {
     //System.setProperty("jersey.config.server.tracing.type", "ALL");
+
   }
+
 
 
   // Application Overrides ------------------------------------------------------------------------
@@ -95,13 +101,92 @@ public class AccountManager extends Application
   // Nested Classes -------------------------------------------------------------------------------
 
   /**
+   * This container filter implements a managed persistence context for JPA entities used
+   * in JAX-RS resources.
+   */
+  private static class EntityPersistence implements ContainerRequestFilter, ContainerResponseFilter
+  {
+    // Class Members ------------------------------------------------------------------------------
+
+    /**
+     * Initialize the persistence context factory.
+     */
+    private static EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("H2");
+
+
+    // Instance Fields ----------------------------------------------------------------------------
+
+    /**
+     * This implements a managed, extended persistence context (see JPA 2.1 specification
+     * section 3.3). For a per transaction context, open and close entity manager per each request
+     * in filter methods of this class.
+     */
+    private EntityManager entityManager = emFactory.createEntityManager();
+
+
+    // ContainerRequestFilter Implementation ------------------------------------------------------
+
+    /**
+     * Passes the entity manager reference as a request property to the resource classes to use.
+     * Also begins the transaction boundary for JPA entities here.
+     */
+    @Override public void filter(ContainerRequestContext request)
+    {
+      try
+      {
+        request.setProperty(ENTITY_MANAGER_LOOKUP, entityManager);
+
+        entityManager.getTransaction().begin();
+      }
+
+      catch (Throwable throwable)
+      {
+        // TODO : log
+
+        EntityTransaction tx = entityManager.getTransaction();
+
+        if (tx != null && tx.isActive())
+        {
+          tx.rollback();
+        }
+      }
+    }
+
+    /**
+     * Manages the entity transaction boundary on return request. If entity transaction has
+     * been marked for rollback, or we are returning an HTTP error code 400 or above, roll back
+     * the entity transaction.
+     */
+    @Override public void filter(ContainerRequestContext request, ContainerResponseContext response)
+    {
+      EntityTransaction tx = entityManager.getTransaction();
+
+      if (tx != null && tx.isActive())
+      {
+        if (tx.getRollbackOnly() || response.getStatus() >= 400)
+        {
+          // TODO : log
+
+          tx.rollback();
+        }
+
+        else
+        {
+          tx.commit();
+        }
+      }
+    }
+  }
+
+
+  /**
    * Implements user authorization as a dynamic feature. This allows authorization configuration
    * to be made available through servlet's deployment descriptor.
    *
    * TODO :
    *   implement user role to resource mapping
    */
-  public static class UserAuthorization implements DynamicFeature
+  private static class UserAuthorization implements DynamicFeature
   {
     @Override public void configure(ResourceInfo info, FeatureContext ctx)
     {
@@ -124,7 +209,7 @@ public class AccountManager extends Application
   /**
    * A basic request authorization filter for incoming requests.
    */
-  public static class AuthorizationRole implements ContainerRequestFilter
+  private static class AuthorizationRole implements ContainerRequestFilter
   {
 
     private Role[] roles;
