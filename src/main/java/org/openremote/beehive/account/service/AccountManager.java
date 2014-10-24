@@ -20,10 +20,6 @@
  */
 package org.openremote.beehive.account.service;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -41,16 +37,12 @@ import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.ext.MessageBodyReader;
 
-import org.openremote.beehive.account.model.UserRegistration;
+import org.openremote.beehive.account.model.rest.UserRegistrationReader;
 import org.openremote.logging.Hierarchy;
 import org.openremote.logging.Logger;
-import org.openremote.model.data.json.JSONTransformer;
 
 
 /**
@@ -323,7 +315,9 @@ public class AccountManager extends Application
       for (Role role : roles)
       {
         if (security.isUserInRole(role.getWebDescriptorRoleName()))
+        {
           return;
+        }
       }
 
       ctx.abortWith(Response.status(Response.Status.FORBIDDEN).build());
@@ -357,7 +351,10 @@ public class AccountManager extends Application
 
   public enum Log implements Hierarchy
   {
-    TRANSACTION("Transaction");
+    TRANSACTION("Transaction"),
+
+    CREATE_USER("Rest.CreateUser");
+
 
     private String name;
 
