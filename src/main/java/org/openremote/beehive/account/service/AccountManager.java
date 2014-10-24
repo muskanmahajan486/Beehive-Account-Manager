@@ -22,7 +22,6 @@ package org.openremote.beehive.account.service;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

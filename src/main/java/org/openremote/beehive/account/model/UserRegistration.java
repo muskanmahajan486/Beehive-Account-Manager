@@ -89,7 +89,7 @@ public class UserRegistration extends User
                                                      Map<String, String> jsonProperties)
         throws DeserializationException
     {
-      User user = super.deserialize(schemaVersion, className,jsonProperties);
+      User user = super.deserialize(schemaVersion, className, jsonProperties);
 
       return new UserRegistration(
           user, jsonProperties.get("credentials").getBytes(Charset.forName("UTF-8"))
