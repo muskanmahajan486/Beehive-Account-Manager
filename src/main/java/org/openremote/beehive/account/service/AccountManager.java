@@ -152,14 +152,17 @@ public class AccountManager extends Application
 
         request.setProperty(ENTITY_TX_LOOKUP, tx);
 
-        log.debug("Starting transaction for user '{0}'...", user);
+        log.info(
+            "Started transaction for user ''{0}'', request ''{1} {2}''...",
+            user, request.getMethod(), request.getUriInfo().getAbsolutePath()
+        );
       }
 
       catch (Throwable throwable)
       {
         log.error(
-            "Failed to start entity persistence transaction for user '{0}' : {1}",
-            throwable, user, throwable.getMessage()
+            "Failed to start entity persistence transaction for user ''{0}'', request {1} : {2}",
+            throwable, user, request.getUriInfo().getAbsolutePath(), throwable.getMessage()
         );
 
         if (tx != null && tx.isActive())
@@ -171,7 +174,7 @@ public class AccountManager extends Application
 
           catch (Throwable t)
           {
-            log.info("Transaction rollback for user '{0}' failed : {1}", t, user, t.getMessage());
+            log.info("Transaction rollback for user ''{0}'' failed : {1}", t, user, t.getMessage());
           }
         }
       }
@@ -184,20 +187,69 @@ public class AccountManager extends Application
      */
     @Override public void filter(ContainerRequestContext request, ContainerResponseContext response)
     {
-      EntityTransaction tx = (EntityTransaction)request.getProperty(ENTITY_TX_LOOKUP);
+      String user = "<no name>";
+      EntityTransaction tx = null;
 
-      if (tx != null && tx.isActive())
+      try
       {
-        if (tx.getRollbackOnly() || response.getStatus() >= 400)
-        {
-          // TODO : log
+        user = request.getSecurityContext().getUserPrincipal().getName();
+        tx = (EntityTransaction)request.getProperty(ENTITY_TX_LOOKUP);
 
-          tx.rollback();
+        if (tx != null && tx.isActive())
+        {
+          if (tx.getRollbackOnly())
+          {
+            tx.rollback();
+
+            log.info(
+                "ROLLBACK: tx for user '{0}' was marked for roll back. Request : ''{1} {2}''",
+                user, request.getMethod(), request.getUriInfo().getAbsolutePath()
+            );
+          }
+
+          else if (response.getStatus() >= 400)
+          {
+            tx.rollback();
+
+            log.info(
+                "ROLLBACK: error response ''{0} : {1}'' to user ''{2}'' request ''{3} {4}''.",
+                response.getStatus(), response.getStatusInfo().getReasonPhrase(),
+                user, request.getMethod(), request.getUriInfo().getAbsolutePath()
+            );
+          }
+
+          else
+          {
+            tx.commit();
+
+            log.info(
+                "COMMIT: user ''{0}'' request ''{1} {2}''",
+                user, request.getMethod(), request.getUriInfo().getAbsolutePath()
+            );
+          }
         }
+      }
 
-        else
+      catch (Throwable throwable)
+      {
+        log.error("Implementation error: {0}", throwable, throwable.getMessage());
+
+        if (tx != null && tx.isActive())
         {
-          tx.commit();
+          try
+          {
+            tx.rollback();
+
+            log.info(
+                "ROLLBACK: user ''{0}'', request ''{1} {2}''.",
+                user, request.getMethod(), request.getUriInfo().getAbsolutePath()
+            );
+          }
+
+          catch (Throwable t)
+          {
+            log.info("Transaction rollback for user ''{0}'' failed : {1}", t, user, t.getMessage());
+          }
         }
       }
     }
