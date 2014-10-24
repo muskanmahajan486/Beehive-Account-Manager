@@ -20,18 +20,38 @@
  */
 package org.openremote.beehive.account.service;
 
-import javax.servlet.ServletConfig;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.util.HashSet;
-import java.util.Set;
+import javax.ws.rs.ext.MessageBodyReader;
+
+import org.openremote.beehive.account.model.UserRegistration;
+import org.openremote.logging.Hierarchy;
+import org.openremote.logging.Logger;
+import org.openremote.model.data.json.JSONTransformer;
+
 
 /**
  * A JAX-RS 2.0 application of OpenRemote Beehive Account Manager Service. <p>
