@@ -49,8 +49,7 @@ public class CreateAccount
 
   // Class Members --------------------------------------------------------------------------------
 
-  @Context
-  private HttpServletRequest request;
+  private static Logger log = Logger.getInstance(AccountManager.Log.CREATE_USER);
 
 
   // Instance Fields ------------------------------------------------------------------------------
