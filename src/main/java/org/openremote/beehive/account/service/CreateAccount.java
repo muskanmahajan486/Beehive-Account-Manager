@@ -20,6 +20,14 @@
  */
 package org.openremote.beehive.account.service;
 
+import org.openremote.beehive.account.model.CustomerFulfillment;
+import org.openremote.beehive.account.model.UserRegistration;
+import org.openremote.logging.Logger;
+import org.openremote.model.data.json.JSONTransformer;
+import org.openremote.model.persistence.jpa.RelationalAccount;
+import org.openremote.model.persistence.jpa.RelationalUser;
+
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -27,8 +35,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 /**
  * TODO
@@ -41,34 +47,69 @@ import java.io.InputStreamReader;
 public class CreateAccount
 {
 
-  @Context
-  private SecurityContext security;
+  // Class Members --------------------------------------------------------------------------------
 
   @Context
   private HttpServletRequest request;
 
-  @POST @Consumes({MediaType.TEXT_XML, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  public String create() throws Exception
+
+  // Instance Fields ------------------------------------------------------------------------------
+
+  @Context private SecurityContext security;
+
+  @Context private HttpServletRequest request;
+
+
+
+  // REST API Implementation ----------------------------------------------------------------------
+
+  @Consumes({ MediaType.APPLICATION_JSON })
+  @POST public void create(UserRegistration registration) throws Exception
   {
-    BufferedReader reader= new BufferedReader(new InputStreamReader(request.getInputStream()));
-
-    System.err.println("CREATE ACCOUNT");
-
-    while(true)
+    if (registration == null)
     {
-      String str = reader.readLine();
-
-      if (str == null)
-      {
-        break;
-      }
-
-      System.err.print(str);
+      throw new JSONTransformer.DeserializationException(
+          "User registration JSON representation was not correctly deserialized."
+      );
     }
 
-    System.err.println("");
+    EntityManager em = getEntityManager();
 
-    return "[SEC: " + security.getUserPrincipal().getName() + "] Created new account.\n";
+    RelationalAccount account = new RelationalAccount();
+    em.persist(account);
+
+    RelationalUser user = new RelationalUser(registration);
+    user.link(account);
+
+    em.persist(user);
+
+    log.info(
+        "CREATE ACCOUNT: [Service admin: ''{0}''] created new account for user ''{1}''.",
+        security.getUserPrincipal().getName(), user.getName()
+    );
   }
+
+  @POST public void create(CustomerFulfillment fulfillment)
+  {
+    throw new RuntimeException("Not implemented yet.");
+  }
+
+
+  /*
+  @POST @Consumes({MediaType.TEXT_XML, MediaType.APPLICATION_XML})
+  public void create(UserRegistration reg, boolean xml) throws Exception
+  {
+    throw new RuntimeException("Not implemented yet.");
+  }
+  */
+
+
+  // Private Instance Methods ---------------------------------------------------------------------
+
+  private EntityManager getEntityManager()
+  {
+    return (EntityManager)request.getAttribute(AccountManager.ENTITY_MANAGER_LOOKUP);
+  }
+
 }
 
