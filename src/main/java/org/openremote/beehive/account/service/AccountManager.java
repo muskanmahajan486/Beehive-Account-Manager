@@ -52,6 +52,8 @@ public class AccountManager extends Application
 
   public static final String ENTITY_MANAGER_LOOKUP = "EntityManager";
 
+  public static final String ENTITY_TX_LOOKUP = "EntityTransaction";
+
 
   // Class Members --------------------------------------------------------------------------------
 
@@ -113,6 +115,9 @@ public class AccountManager extends Application
      */
     private static EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("H2");
 
+    private static Logger log = Logger.getInstance(Log.TRANSACTION);
+
+
 
     // Instance Fields ----------------------------------------------------------------------------
 
@@ -132,22 +137,42 @@ public class AccountManager extends Application
      */
     @Override public void filter(ContainerRequestContext request)
     {
+      EntityTransaction tx = null;
+      String user = "<no name>";
+
       try
       {
+        user = request.getSecurityContext().getUserPrincipal().getName();
+
         request.setProperty(ENTITY_MANAGER_LOOKUP, entityManager);
 
-        entityManager.getTransaction().begin();
+        tx = entityManager.getTransaction();
+
+        tx.begin();
+
+        request.setProperty(ENTITY_TX_LOOKUP, tx);
+
+        log.debug("Starting transaction for user '{0}'...", user);
       }
 
       catch (Throwable throwable)
       {
-        // TODO : log
-
-        EntityTransaction tx = entityManager.getTransaction();
+        log.error(
+            "Failed to start entity persistence transaction for user '{0}' : {1}",
+            throwable, user, throwable.getMessage()
+        );
 
         if (tx != null && tx.isActive())
         {
-          tx.rollback();
+          try
+          {
+            tx.rollback();
+          }
+
+          catch (Throwable t)
+          {
+            log.info("Transaction rollback for user '{0}' failed : {1}", t, user, t.getMessage());
+          }
         }
       }
     }
@@ -159,7 +184,7 @@ public class AccountManager extends Application
      */
     @Override public void filter(ContainerRequestContext request, ContainerResponseContext response)
     {
-      EntityTransaction tx = entityManager.getTransaction();
+      EntityTransaction tx = (EntityTransaction)request.getProperty(ENTITY_TX_LOOKUP);
 
       if (tx != null && tx.isActive())
       {
@@ -255,6 +280,23 @@ public class AccountManager extends Application
     @Override public String toString()
     {
       return getWebDescriptorRoleName();
+    }
+  }
+
+  public enum Log implements Hierarchy
+  {
+    TRANSACTION("Transaction");
+
+    private String name;
+
+    private Log(String name)
+    {
+      this.name = name;
+    }
+
+    @Override public String getCanonicalLogHierarchyName()
+    {
+      return "OpenRemote.AccountManager." + name;
     }
   }
 }
