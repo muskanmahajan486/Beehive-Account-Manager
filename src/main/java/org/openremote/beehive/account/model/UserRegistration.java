@@ -20,10 +20,13 @@
  */
 package org.openremote.beehive.account.model;
 
+import org.openremote.base.Version;
 import org.openremote.model.User;
 import org.openremote.model.data.json.UserTransformer;
 
+import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * TODO
@@ -53,11 +56,30 @@ public class UserRegistration extends User
 
   // Nested Classes -------------------------------------------------------------------------------
 
-  protected class RegistrationTransformer extends UserTransformer
+  public static class RegistrationTransformer extends UserTransformer
   {
     @Override public void extendedProperties(User user)
     {
       writeProperty("credentials", new String(credentials, Charset.forName("UTF-8")));
+    }
+
+    @Override protected UserRegistration deserialize(Version schemaVersion,
+                                                     String className,
+                                                     Map<String, String> jsonProperties)
+        throws DeserializationException
+    {
+      User user = super.deserialize(schemaVersion, className,jsonProperties);
+
+      return new UserRegistration(
+          user, jsonProperties.get("credentials").getBytes(Charset.forName("UTF-8"))
+      );
+    }
+
+    @Override public UserRegistration read(Reader reader) throws DeserializationException
+    {
+      User user = super.read(reader);
+
+      return new UserRegistration(user, credentials);
     }
   }
 }
