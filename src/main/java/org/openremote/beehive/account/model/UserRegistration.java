@@ -48,7 +48,16 @@ public class UserRegistration extends User
   {
     super(username, email);
 
-    super.jsonTransformer = new RegistrationTransformer();
+    super.jsonTransformer = new RegistrationTransformer(credentials);
+
+    this.credentials = credentials;
+  }
+
+  private UserRegistration(User user, byte[] credentials)
+  {
+    super(user);
+
+    super.jsonTransformer = new RegistrationTransformer(credentials);
 
     this.credentials = credentials;
   }
@@ -58,7 +67,19 @@ public class UserRegistration extends User
 
   public static class RegistrationTransformer extends UserTransformer
   {
-    @Override public void extendedProperties(User user)
+    private byte[] credentials;
+
+    public RegistrationTransformer()
+    {
+
+    }
+
+    private RegistrationTransformer(byte[] credentials)
+    {
+      this.credentials = credentials;
+    }
+
+    @Override protected void extendedProperties(User user)
     {
       writeProperty("credentials", new String(credentials, Charset.forName("UTF-8")));
     }
