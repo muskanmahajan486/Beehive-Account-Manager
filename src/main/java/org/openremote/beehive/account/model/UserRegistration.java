@@ -20,6 +20,8 @@
  */
 package org.openremote.beehive.account.model;
 
+import org.bouncycastle.crypto.generators.SCrypt;
+import org.bouncycastle.util.encoders.Base64;
 import org.openremote.base.Version;
 import org.openremote.base.exception.IncorrectImplementationException;
 import org.openremote.model.User;
@@ -48,6 +50,8 @@ public class UserRegistration extends User
   // Constants ------------------------------------------------------------------------------------
 
   public static final Charset UTF8 = Charset.forName("UTF-8");
+
+  public static final String SALT_PADDING = "ORSaltPadding";
 
 
   // Instance Fields ------------------------------------------------------------------------------
@@ -147,7 +151,7 @@ public class UserRegistration extends User
       // Create an instance of this with additional properties...
 
       return new UserRegistration(
-          user, jsonProperties.get("credentials").getBytes(UTF8)
+          user, scrypt(user, jsonProperties.get("credentials").getBytes(UTF8))
       );
     }
 
@@ -181,6 +185,24 @@ public class UserRegistration extends User
         );
       }
     }
+
+
+    // Private Instance Methods -------------------------------------------------------------------
+
+    // http://www.tarsnap.com/scrypt/scrypt.pdf
+    private byte[] scrypt(User user, byte[] passphrase)
+    {
+      byte[] salt = (user.getName() + SALT_PADDING).getBytes(UTF8);
+
+      int iterationCountN = 16384;    // 2^14 (< 100 ms), general work factor (2^20 for ~5s)
+      int hashBlockSize = 8;          // relative memory cost
+      int parallelization = 1;        // CPU cost
+      int dkLen = 127;                // length of the result key
+
+      return SCrypt.generate(
+          passphrase, salt, iterationCountN, hashBlockSize, parallelization, dkLen);
+    }
+
   }
 }
 
