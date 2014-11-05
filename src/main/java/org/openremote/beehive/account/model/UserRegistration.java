@@ -21,6 +21,7 @@
 package org.openremote.beehive.account.model;
 
 import org.openremote.base.Version;
+import org.openremote.base.exception.IncorrectImplementationException;
 import org.openremote.model.User;
 import org.openremote.model.data.json.UserTransformer;
 
@@ -100,7 +101,17 @@ public class UserRegistration extends User
     {
       User user = super.read(reader);
 
-      return new UserRegistration(user, credentials);
+      try
+      {
+        return (UserRegistration)user;
+      }
+
+      catch (ClassCastException e)
+      {
+        throw new IncorrectImplementationException(
+            "Deserialization does not return expected ''UserRegistration'' type."
+        );
+      }
     }
   }
 }
