@@ -45,6 +45,11 @@ import java.util.Map;
 public class UserRegistration extends User
 {
 
+  // Constants ------------------------------------------------------------------------------------
+
+  public static final Charset UTF8 = Charset.forName("UTF-8");
+
+
   // Instance Fields ------------------------------------------------------------------------------
 
   private transient byte[] credentials;
@@ -82,7 +87,13 @@ public class UserRegistration extends User
    */
   public static class RegistrationTransformer extends UserTransformer
   {
-    private byte[] credentials;
+
+    // Instance Fields ----------------------------------------------------------------------------
+
+    private transient byte[] credentials;
+
+
+    // Constructors -------------------------------------------------------------------------------
 
     public RegistrationTransformer()
     {
@@ -109,7 +120,7 @@ public class UserRegistration extends User
      */
     @Override protected void writeExtendedProperties(User user)
     {
-      writeProperty("credentials", new String(credentials, Charset.forName("UTF-8")));
+      writeProperty("credentials", new String(credentials, UTF8));
     }
 
 
@@ -136,7 +147,7 @@ public class UserRegistration extends User
       // Create an instance of this with additional properties...
 
       return new UserRegistration(
-          user, jsonProperties.get("credentials").getBytes(Charset.forName("UTF-8"))
+          user, jsonProperties.get("credentials").getBytes(UTF8)
       );
     }
 
