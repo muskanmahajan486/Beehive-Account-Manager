@@ -30,7 +30,15 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
- * TODO
+ * This domain object extends the class {@link org.openremote.model.User} from OpenRemote object
+ * model with user details that are transferred between processes as part of the registration
+ * process. In particular, it adds fields that would normally not traverse between systems
+ * after the registration process is complete. <p>
+ *
+ * This implementation is specific to this Beehive Account Manager implementation, and therefore
+ * not part of the shared OpenRemote object model. Account and user registrations should occur
+ * through the Account Manager service. The account service can then delegate relevant
+ * registration information and manage registration processes further in the back-end systems.
  *
  * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
  */
@@ -66,6 +74,12 @@ public class UserRegistration extends User
 
   // Nested Classes -------------------------------------------------------------------------------
 
+
+  /**
+   * Extends the {@link org.openremote.model.User} object's JSON transformer implementation to
+   * manage the serialization of additional data fields that are only present at the registration
+   * phase.
+   */
   public static class RegistrationTransformer extends UserTransformer
   {
     private byte[] credentials;
@@ -80,30 +94,73 @@ public class UserRegistration extends User
       this.credentials = credentials;
     }
 
-    @Override protected void extendedProperties(User user)
+
+    // Overrides UserTransformer ------------------------------------------------------------------
+
+    /**
+     * This is an implementation of the property field extension mechanism provided by the
+     * super class in {@link org.openremote.model.data.json.UserTransformer}. It adds a
+     * 'credentials' field to the serialized JSON document sent to a service end-point. <p>
+     *
+     * For the purpose of the serialization, credentials bytes are converted to an
+     * {@link UserRegistration#UTF8} string.
+     *
+     * @param user
+     */
+    @Override protected void writeExtendedProperties(User user)
     {
       writeProperty("credentials", new String(credentials, Charset.forName("UTF-8")));
     }
 
+
+    /**
+     * Deserializes this instance as an extension of {@link org.openremote.model.User} object.
+     *
+     * @param schemaVersion
+     * @param className
+     * @param jsonProperties
+     *
+     * @return
+     *
+     * @throws DeserializationException
+     */
     @Override protected UserRegistration deserialize(Version schemaVersion,
                                                      String className,
                                                      Map<String, String> jsonProperties)
         throws DeserializationException
     {
-      User user = super.deserialize(schemaVersion, className, jsonProperties);
+      // Let superclass deserialize itself first...
+
+      User user = super.deserialize(schemaVersion, User.class.getName(), jsonProperties);
+
+      // Create an instance of this with additional properties...
 
       return new UserRegistration(
           user, jsonProperties.get("credentials").getBytes(Charset.forName("UTF-8"))
       );
     }
 
+    /**
+     * Overridden to return instances of this class, as returned by the
+     * {@link #deserialize(org.openremote.base.Version, String, java.util.Map)} implementation.
+     *
+     * @param reader
+     *          input stream to deserialize this instance form
+     *
+     * @return  a new instance of this class
+     *
+     * @throws  DeserializationException
+     *            if read deserialization fails
+     */
     @Override public UserRegistration read(Reader reader) throws DeserializationException
     {
-      User user = super.read(reader);
+      // We know it is an instance of this class since we implement it as such in the
+      // deserialize method above. Just need to remember to make changes on both methods
+      // if the type ever changes...
 
       try
       {
-        return (UserRegistration)user;
+        return (UserRegistration) super.read(reader);
       }
 
       catch (ClassCastException e)
