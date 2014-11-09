@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -97,31 +98,44 @@ public class UserRegistrationTest
   /**
    * Basic constructor tests.
    *
-   * @throws Exception  if tests fail
+   * @throws Exception
+   *            if tests fail
    */
   @Test public void testCtor() throws Exception
   {
-    // check the instance data after creation...
+    char[] password = new char[] { 'p', 'a', 's', 's', 'p', 'h', 'r', 'a', 's', 'e' };
+    byte[] credentials = convertToUTF8Bytes(password);
 
-    RegistrationData reg = new RegistrationData(new UserRegistration(
-        "abc", "some@email.at.somewhere", "passphare".getBytes(UserRegistration.UTF8)
-    ));
+    try
+    {
+      // check the instance data after creation...
 
-    Assert.assertTrue(reg.username.equals("abc"));
-    Assert.assertTrue(reg.email.equals("some@email.at.somewhere"));
-    Assert.assertTrue(reg.accounts.isEmpty());
+      RegistrationData reg = new RegistrationData(new UserRegistration(
+          "abc", "some@email.at.somewhere", credentials
+      ));
+
+      Assert.assertTrue(reg.username.equals("abc"));
+      Assert.assertTrue(reg.email.equals("some@email.at.somewhere"));
+      Assert.assertTrue(reg.accounts.isEmpty());
 
 
-    // check the JSON data presentation after creation...
+      // check the JSON data presentation after creation...
 
-    UserRegistration ur = new UserRegistration(
-        "foo", "email@host.domain", "secret".getBytes(UserRegistration.UTF8)
-    );
+      password = new char[] { 's', 'e', 'c', 'r', 'e', 't' };
+      credentials = convertToUTF8Bytes(password);
 
-    Assert.assertTrue(
-        compare(ur.toJSONString(), userRegistrationJSON),
-        ur.toJSONString() + "\n\n" + userRegistrationJSON
-    );
+      UserRegistration ur = new UserRegistration("foo", "email@host.domain", credentials);
+
+      Assert.assertTrue(
+          compare(ur.toJSONString(), userRegistrationJSON),
+          ur.toJSONString() + "\n\n" + userRegistrationJSON
+      );
+    }
+
+    finally
+    {
+      clear(credentials);
+    }
   }
 
   /**
@@ -133,191 +147,168 @@ public class UserRegistrationTest
   {
     // check the instance data after creation...
 
-    UserRegistration ur = new UserRegistration(
-        "每日一懶", "email@host.domain", "是啊!!三隻肥腸圓滾滾!!".getBytes(UserRegistration.UTF8)
-    );
+    char[] password = new char[] { '是', '啊', '!', '!', '三', '隻', '肥', '腸', '圓', '滾', '滾', '!', '!' };
+    byte[] credentials = convertToUTF8Bytes(password);
 
-    RegistrationData reg = new RegistrationData(ur);
-
-    Assert.assertTrue(reg.username.equals("每日一懶"));
-    Assert.assertTrue(reg.email.equals("email@host.domain"));
-    Assert.assertTrue(reg.accounts.isEmpty());
-
-    // check the JSON data presentation...
-
-    Assert.assertTrue(
-        compare(ur.toJSONString(), userRegistrationCharsJSON),
-        ur.toJSONString() + String.format("%n%n") + userRegistrationCharsJSON
-    );
-  }
-
-
-  private byte[] convertToUTF8Bytes(char[] array)
-  {
-    CharBuffer chars = CharBuffer.wrap(array);
-    ByteBuffer bytes = UserRegistration.UTF8.encode(chars);
-
-    byte[] buffer = bytes.array();
-
-    chars.clear();
-    bytes.clear();
-
-    clear(array);
-
-    return buffer;
-  }
-
-  private void clear(char[] array)
-  {
-    for (char c : array)
+    try
     {
-      c = 0;
+      UserRegistration ur = new UserRegistration("每日一懶", "email@host.domain", credentials);
+
+      RegistrationData reg = new RegistrationData(ur);
+
+      Assert.assertTrue(reg.username.equals("每日一懶"));
+      Assert.assertTrue(reg.email.equals("email@host.domain"));
+      Assert.assertTrue(reg.accounts.isEmpty());
+
+      // check the JSON data presentation...
+
+      Assert.assertTrue(
+          compare(ur.toJSONString(), userRegistrationCharsJSON),
+          ur.toJSONString() + String.format("%n%n") + userRegistrationCharsJSON
+      );
     }
-  }
 
-  private void clear(byte[] array)
-  {
-    for (byte b : array)
+    finally
     {
-      b = 0;
+      clear(credentials);
     }
   }
 
 
   /**
-   * Test email validation in constructor.
+   * Test email validation in constructor, invalid host.
    */
-  @Test public void testCtorNotValidEmail()
+  @Test (expectedExceptions = Model.ValidationException.class)
+
+  public void testCtorNotValidEmail1() throws Exception
   {
-
-    // should not be valid with default validator, domain should have minimum 2 chars...
-
     char[] password = new char[] { 'p', 'a', 's', 's', 'p', 'h', 'r', 'a', 's', 'e' };
     byte[] credentials = convertToUTF8Bytes(password);
 
     try
     {
+      // should not be valid with default validator, domain should have minimum 2 chars...
+
       new UserRegistration("abc", "some@email.d", credentials);
-
-      Assert.fail("should not get here...");
-    }
-
-    catch (Model.ValidationException e)
-    {
-      // expected...
     }
 
     finally
     {
       clear(credentials);
     }
+  }
 
+
+  /**
+   * Test email validation in constructor, malformed email format.
+   */
+  @Test (expectedExceptions = Model.ValidationException.class)
+
+  public void testCtorNotValidEmail2() throws Exception
+  {
+    char[] password = new char[] { 'p', 'a', 's', 's', 'p', 'o', 'r', 't' };
+    byte[] credentials = convertToUTF8Bytes(password);
 
     // should not be valid with default validator, email and host is missing...
-
-    password = new char[] { 'p', 'a', 's', 's', 'p', 'o', 'r', 't' };
-    credentials = convertToUTF8Bytes(password);
 
     try
     {
       new UserRegistration("abc", "@.de", credentials);
-
-      Assert.fail("should not get here...");
-    }
-
-    catch (Model.ValidationException e)
-    {
-      // expected...
     }
 
     finally
     {
       clear(credentials);
     }
+  }
 
+  /**
+   * Test email validation in constructor, no domain.
+   */
+  @Test (expectedExceptions = Model.ValidationException.class)
 
-    // should not be valid with default validator, domain is missing...
-
-    password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
-    credentials = convertToUTF8Bytes(password);
+  public void testCtorNotValidEmail3() throws Exception
+  {
+    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+    byte[] credentials = convertToUTF8Bytes(password);
 
     try
     {
+      // should not be valid with default validator, domain is missing...
+
       new UserRegistration("abc", "some@email", credentials);
-
-      Assert.fail("should not get here...");
-    }
-
-    catch (Model.ValidationException e)
-    {
-      // expected...
     }
 
     finally
     {
       clear(credentials);
     }
+  }
 
 
-    // 'Some' should not be a valid email with default email validator...
+  /**
+   * Test email validation in constructor, not an email format.
+   */
+  @Test (expectedExceptions = Model.ValidationException.class)
 
-    password = new char[] { 'p', '4', 's', 's', 'w', '0', 'r', 'd' };
-    credentials = convertToUTF8Bytes(password);
+  public void testCtorNotValidEmail4() throws Exception
+  {
+    char[] password = new char[] { 'p', '4', 's', 's', 'w', '0', 'r', 'd' };
+    byte[] credentials = convertToUTF8Bytes(password);
 
     try
     {
+      // 'Some' should not be a valid email with default email validator...
+
       new UserRegistration("abc", "some", credentials);
-
-      Assert.fail("should not get here...");
-    }
-
-    catch (Model.ValidationException e)
-    {
-      // expected...
     }
 
     finally
     {
       clear(credentials);
     }
+  }
 
 
-    // Empty email is not allowed by default validator, use null instead for no email...
+  /**
+   * Test email validation in constructor, empty string is not valid.
+   */
+  @Test (expectedExceptions = Model.ValidationException.class)
 
-    password = new char[] { 'P', '4', 'S', 's', 'W', '0', 'r', 'D' };
-    credentials = convertToUTF8Bytes(password);
+  public void testCtorNotValidEmail5() throws Exception
+  {
+    char[] password = new char[] { 'P', '4', 'S', 's', 'W', '0', 'r', 'D' };
+    byte[] credentials = convertToUTF8Bytes(password);
 
     try
     {
+      // Empty email is not allowed by default validator, use null instead for no email...
+
       new UserRegistration("abc", "", credentials);
-
-      Assert.fail("should not get here...");
-    }
-
-    catch (Model.ValidationException e)
-    {
-      // expected...
     }
 
     finally
     {
       clear(credentials);
     }
+  }
 
 
-    // Default validator allows null references for email...
-
-    password = new char[] { 'P', '4', 'S', 's', 'P', '0', 'R', '7' };
-    credentials = convertToUTF8Bytes(password);
+  /**
+   * Test email validation in constructor, nulls are allowed.
+   */
+  @Test public void testCtorNullEmail() throws Exception
+  {
+    char[] password = new char[] { 'P', '4', 'S', 's', 'P', '0', 'R', '7' };
+    byte[] credentials = convertToUTF8Bytes(password);
 
     try
     {
-      new UserRegistration("abc", null, credentials);
-    }
+      // Default validator allows null references for email...
 
-    catch (Model.ValidationException e)
-    {
-      Assert.fail("should not get here...");
+      UserRegistration ur = new UserRegistration("abc", null, credentials);
+
+      Assert.assertTrue(new RegistrationData(ur).email.equals(""));
     }
 
     finally
@@ -827,6 +818,43 @@ public class UserRegistrationTest
 
 
   // Helper Methods -------------------------------------------------------------------------------
+
+
+  /**
+   * Converts character array to UTF8 bytes without relying on String.getBytes(). Array is
+   * cleared when this method is done.
+   */
+  private byte[] convertToUTF8Bytes(char[] array)
+  {
+    CharBuffer chars = CharBuffer.wrap(array);
+    ByteBuffer bytes = UserRegistration.UTF8.encode(chars);
+
+    byte[] buffer = Arrays.copyOf(bytes.array(), bytes.limit());
+
+    chars.clear();
+    bytes.clear();
+
+    clear(array);
+
+    return buffer;
+  }
+
+  private void clear(char[] array)
+  {
+    for (char c : array)
+    {
+      c = 0;
+    }
+  }
+
+  private void clear(byte[] array)
+  {
+    for (byte b : array)
+    {
+      b = 0;
+    }
+  }
+
 
   private boolean compare(String json1, String json2)
   {
