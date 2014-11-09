@@ -1,0 +1,12 @@
+{
+  "libraryName": "OpenRemote Object Model",
+  "javaFullClassName": "org.openremote.beehive.account.model.UserRegistration",
+  "schemaVersion": "2.0.0",
+  "apiVersion": "0.2",
+
+  "model": {
+    "username": "每日一懶",
+    "email": "email@host.domain",
+    "credentials": "是啊!!三隻肥腸圓滾滾!!"
+  }
+}
