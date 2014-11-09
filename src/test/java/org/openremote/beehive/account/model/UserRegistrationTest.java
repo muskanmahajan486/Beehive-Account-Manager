@@ -418,68 +418,63 @@ public class UserRegistrationTest
   /**
    * Tests constructor with default username validator.
    */
-  @Test public void testValidUsername()
+  @Test public void testValidUsername() throws Exception
   {
-    // basic valid user name....
-
     char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
     byte[] credentials = convertToUTF8Bytes(password);
 
     try
     {
+      // basic valid user name....
+
       new UserRegistration("abc", "some@email.de", credentials);
     }
 
-    catch (Model.ValidationException e)
-    {
-      Assert.fail("should not get here...");
-    }
-
     finally
     {
       clear(credentials);
     }
+  }
 
 
+  /**
+   * Tests constructor with default username validator and empty string.
+   */
+  @Test (expectedExceptions = Model.ValidationException.class)
 
-    // empty usernames are not allowed...
-
-    password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
-    credentials = convertToUTF8Bytes(password);
+  public void testInvalidUsername1() throws Exception
+  {
+    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+    byte[] credentials = convertToUTF8Bytes(password);
 
     try
     {
+      // empty usernames are not allowed...
+
       new UserRegistration("", "some@email.de", credentials);
-
-      Assert.fail("should not get here...");
-    }
-
-    catch (Model.ValidationException e)
-    {
-      // expected...
     }
 
     finally
     {
       clear(credentials);
     }
+  }
 
+  /**
+   * Tests constructor with default username validator and null username.
+   */
+  @Test (expectedExceptions = Model.ValidationException.class)
 
-    // Null usernames are not allowed...
-
-    password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
-    credentials = convertToUTF8Bytes(password);
+  public void testInvalidUsername2() throws Exception
+  {
+    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+    byte[] credentials = convertToUTF8Bytes(password);
 
     try
     {
+      // Null usernames are not allowed...
+
       new UserRegistration(null, "some@email.de", credentials);
-
-      Assert.fail("should not get here...");
-    }
-
-    catch (Model.ValidationException e)
-    {
-      // expected...
     }
 
     finally
@@ -496,13 +491,13 @@ public class UserRegistrationTest
   {
     try
     {
-      // regular name should be accepted...
-
       char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
       byte[] credentials = convertToUTF8Bytes(password);
 
       try
       {
+        // regular name should be accepted...
+
         new UserRegistration("somename", "some@email.de", credentials);
       }
 
@@ -588,7 +583,7 @@ public class UserRegistrationTest
   {
     try
     {
-      // Only any username (nulls and empties are still rejected)...
+      // Accept any username (nulls and empties are still rejected)...
 
       User.setNameValidator(new Model.Validator<String>()
       {
@@ -741,6 +736,31 @@ public class UserRegistrationTest
   }
 
 
+  @Test public void testCtorCreds() throws Exception
+  {
+    char[] password = new char[] { 's', 'e', 'c', 'r', 'e', 't' };
+    byte[] credentials = convertToUTF8Bytes(password);
+
+    UserRegistration ur1 = new UserRegistration("foo", "email@host.domain", credentials);
+
+    Assert.assertTrue(
+        compare(ur1.toJSONString(), userRegistrationJSON),
+        ur1.toJSONString() + "\n\n" + userRegistrationJSON
+    );
+  }
+
+
+  @Test (expectedExceptions = Model.ValidationException.class)
+
+  public void testCtorNullCreds() throws Exception
+  {
+    new UserRegistration("abc", "me@somewhere.country", null);
+  }
+
+
+
+
+  // Copy Constructor Tests -----------------------------------------------------------------------
 
   @Test public void testCopyCtor() throws Exception
   {
@@ -772,34 +792,6 @@ public class UserRegistrationTest
   }
 
 
-
-  @Test public void testCreds() throws Exception
-  {
-    UserRegistration ur1 = new UserRegistration(
-        "foo", "email@host.domain", "secret".getBytes(UserRegistration.UTF8)
-    );
-
-    Assert.assertTrue(
-        compare(ur1.toJSONString(), userRegistrationJSON),
-        ur1.toJSONString() + "\n\n" + userRegistrationJSON
-    );
-  }
-
-
-  @Test public void testValidCreds() throws Exception
-  {
-    try
-    {
-      new UserRegistration("abc", "me@somewhere.country", null);
-
-      Assert.fail("should not get here...");
-    }
-
-    catch (Model.ValidationException e)
-    {
-      // expected
-    }
-  }
 
 
 
