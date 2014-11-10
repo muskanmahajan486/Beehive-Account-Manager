@@ -764,15 +764,28 @@ public class UserRegistrationTest
 
   @Test public void testCtorCreds() throws Exception
   {
-    char[] password = new char[] { 's', 'e', 'c', 'r', 'e', 't' };
-    byte[] credentials = convertToUTF8Bytes(password);
+    UserRegistration.setCredentialsSizeConstraint(6, 6);
 
-    UserRegistration ur1 = new UserRegistration("foo", "email@host.domain", credentials);
+    try
+    {
+      char[] password = new char[] { 's', 'e', 'c', 'r', 'e', 't' };
+      byte[] credentials = convertToUTF8Bytes(password);
 
-    Assert.assertTrue(
-        compare(ur1.toJSONString(), userRegistrationJSON),
-        ur1.toJSONString() + "\n\n" + userRegistrationJSON
-    );
+      UserRegistration ur1 = new UserRegistration("foo", "email@host.domain", credentials);
+
+      Assert.assertTrue(
+          compare(ur1.toJSONString(), userRegistrationJSON),
+          ur1.toJSONString() + "\n\n" + userRegistrationJSON
+      );
+    }
+
+    finally
+    {
+      UserRegistration.setCredentialsSizeConstraint(
+          UserRegistration.DEFAULT_CREDENTIALS_MIN_LEN,
+          UserRegistration.DEFAULT_CREDENTIALS_MAX_LEN
+      );
+    }
   }
 
 
@@ -827,13 +840,29 @@ public class UserRegistrationTest
 
   @Test public void testUserRegistrationJSON() throws Exception
   {
-    UserRegistration reg = new UserRegistration(
-        "foo", "email@host.domain", "secret".getBytes(UserRegistration.UTF8)
-    );
+    UserRegistration.setCredentialsSizeConstraint(6, 6);
 
-    String json = reg.toJSONString();
+    char[] password = new char[] { 's', 'e', 'c', 'r', 'e', 't' };
+    byte[] credentials = convertToUTF8Bytes(password);
 
-    Assert.assertTrue(compare(json, userRegistrationJSON), json + "\n\n" + userRegistrationJSON);
+    try
+    {
+      UserRegistration reg = new UserRegistration(
+          "foo", "email@host.domain", credentials
+      );
+
+      String json = reg.toJSONString();
+
+      Assert.assertTrue(compare(json, userRegistrationJSON), json + "\n\n" + userRegistrationJSON);
+    }
+
+    finally
+    {
+      UserRegistration.setCredentialsSizeConstraint(
+          UserRegistration.DEFAULT_CREDENTIALS_MIN_LEN,
+          UserRegistration.DEFAULT_CREDENTIALS_MAX_LEN
+      );
+    }
   }
 
 
