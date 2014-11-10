@@ -34,8 +34,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -86,7 +88,7 @@ public class UserRegistrationTest
    * is nice, not trusting that they always do. Therefore reset to default validators before
    * and after each test.
    */
-  @BeforeTest @AfterTest public void resetDefaultValidators()
+  @BeforeMethod @AfterMethod public void resetDefaultValidators()
   {
     User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
     User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
