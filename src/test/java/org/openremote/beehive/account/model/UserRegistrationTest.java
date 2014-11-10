@@ -127,6 +127,8 @@ public class UserRegistrationTest
 
       // check the JSON data presentation after creation...
 
+      UserRegistration.setCredentialsSizeConstraint(6, 6);
+
       password = new char[] { 's', 'e', 'c', 'r', 'e', 't' };
       credentials = convertToUTF8Bytes(password);
 
@@ -141,8 +143,14 @@ public class UserRegistrationTest
     finally
     {
       clear(credentials);
+
+      UserRegistration.setCredentialsSizeConstraint(
+          UserRegistration.DEFAULT_CREDENTIALS_MIN_LEN,
+          UserRegistration.DEFAULT_CREDENTIALS_MAX_LEN
+      );
     }
   }
+
 
   /**
    * Basic constructor test with UTF8 charset.
@@ -212,7 +220,7 @@ public class UserRegistrationTest
 
   public void testCtorNotValidEmail2() throws Exception
   {
-    char[] password = new char[] { 'p', 'a', 's', 's', 'p', 'o', 'r', 't' };
+    char[] password = new char[] { 'p', 'a', 's', 's', 'p', 'o', 'r', 't', '1', '2', '3' };
     byte[] credentials = convertToUTF8Bytes(password);
 
     // should not be valid with default validator, email and host is missing...
@@ -235,7 +243,7 @@ public class UserRegistrationTest
 
   public void testCtorNotValidEmail3() throws Exception
   {
-    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '3', '2', '1' };
     byte[] credentials = convertToUTF8Bytes(password);
 
     try
@@ -259,7 +267,7 @@ public class UserRegistrationTest
 
   public void testCtorNotValidEmail4() throws Exception
   {
-    char[] password = new char[] { 'p', '4', 's', 's', 'w', '0', 'r', 'd' };
+    char[] password = new char[] { 'p', '4', 's', 's', 'w', '0', 'r', 'd', '4', '5', '6' };
     byte[] credentials = convertToUTF8Bytes(password);
 
     try
@@ -283,7 +291,7 @@ public class UserRegistrationTest
 
   public void testCtorNotValidEmail5() throws Exception
   {
-    char[] password = new char[] { 'P', '4', 'S', 's', 'W', '0', 'r', 'D' };
+    char[] password = new char[] { 'P', '4', 'S', 's', 'W', '0', 'r', 'D', '6', '5', '4' };
     byte[] credentials = convertToUTF8Bytes(password);
 
     try
@@ -305,7 +313,7 @@ public class UserRegistrationTest
    */
   @Test public void testCtorNullEmail() throws Exception
   {
-    char[] password = new char[] { 'P', '4', 'S', 's', 'P', '0', 'R', '7' };
+    char[] password = new char[] { 'P', '4', 'S', 's', 'P', '0', 'R', '7', '8', '9' };
     byte[] credentials = convertToUTF8Bytes(password);
 
     try
@@ -333,7 +341,7 @@ public class UserRegistrationTest
     {
       // .de emails should be valid in default email validator...
 
-      char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2' };
       byte[] credentials = convertToUTF8Bytes(password);
 
       try
@@ -372,7 +380,7 @@ public class UserRegistrationTest
 
       // .de email should now fail...
 
-      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2' };
       credentials = convertToUTF8Bytes(password);
 
       try
@@ -395,7 +403,7 @@ public class UserRegistrationTest
 
       // .fi email should now pass...
 
-      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2' };
       credentials = convertToUTF8Bytes(password);
 
       try
@@ -426,14 +434,17 @@ public class UserRegistrationTest
    */
   @Test public void testValidUsername() throws Exception
   {
-    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2' };
     byte[] credentials = convertToUTF8Bytes(password);
 
     try
     {
       // basic valid user name....
 
-      new UserRegistration("abc", "some@email.de", credentials);
+      UserRegistration ur = new UserRegistration("abc", "some@email.de", credentials);
+
+      Assert.assertTrue(new RegistrationData(ur).username.equals("abc"));
+      Assert.assertTrue(new RegistrationData(ur).email.equals("some@email.de"));
     }
 
     finally
@@ -450,7 +461,7 @@ public class UserRegistrationTest
 
   public void testInvalidUsername1() throws Exception
   {
-    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
     byte[] credentials = convertToUTF8Bytes(password);
 
     try
@@ -473,7 +484,7 @@ public class UserRegistrationTest
 
   public void testInvalidUsername2() throws Exception
   {
-    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
     byte[] credentials = convertToUTF8Bytes(password);
 
     try
@@ -497,14 +508,17 @@ public class UserRegistrationTest
   {
     try
     {
-      char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'D', '1', '2' };
       byte[] credentials = convertToUTF8Bytes(password);
 
       try
       {
         // regular name should be accepted...
 
-        new UserRegistration("somename", "some@email.de", credentials);
+        UserRegistration ur = new UserRegistration("somename", "some@email.de", credentials);
+
+        Assert.assertTrue(new RegistrationData(ur).username.equals("somename"));
+        Assert.assertTrue(new RegistrationData(ur).email.equals("some@email.de"));
       }
 
       catch (Model.ValidationException e)
@@ -534,7 +548,7 @@ public class UserRegistrationTest
 
       // Previous regular name should now fail...
 
-      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '3', '4' };
       credentials = convertToUTF8Bytes(password);
 
       try
@@ -557,12 +571,17 @@ public class UserRegistrationTest
 
       // ACME username should still be accepted...
 
-      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      password = new char[] { 'p', 'a', 's', 'S', 'w', 'o', 'r', 'd', '5', '5' };
       credentials = convertToUTF8Bytes(password);
 
       try
       {
-        new UserRegistration("ACME-somename", "some@email.de", credentials);
+        RegistrationData data = new RegistrationData(
+            new UserRegistration("ACME-somename", "some@email.de", credentials)
+        );
+
+        Assert.assertTrue(data.username.equals("ACME-somename"));
+        Assert.assertTrue(data.email.equals("some@email.de"));
       }
 
       catch (Model.ValidationException e)
@@ -581,6 +600,7 @@ public class UserRegistrationTest
       User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
     }
   }
+
 
   /**
    * Test constructor user name validation with custom validator with empty and null user names.
@@ -602,7 +622,7 @@ public class UserRegistrationTest
 
       // Null usernames should always fail, despite what the validator says...
 
-      char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '3', '2', '1' };
       byte[] credentials = convertToUTF8Bytes(password);
 
       try
@@ -624,7 +644,7 @@ public class UserRegistrationTest
 
       // Empty usernames should always fail, despite what the validator says...
 
-      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '9', '8', '7' };
       credentials = convertToUTF8Bytes(password);
 
       try
@@ -647,7 +667,7 @@ public class UserRegistrationTest
 
       // Empty usernames should always fail, despite what the validator says...
 
-      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '3', '3', '3' };
       credentials = convertToUTF8Bytes(password);
 
       try
@@ -670,7 +690,7 @@ public class UserRegistrationTest
 
       // Empty usernames should always fail, despite what the validator says...
 
-      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '5', '5' };
       credentials = convertToUTF8Bytes(password);
 
       try
@@ -693,7 +713,7 @@ public class UserRegistrationTest
 
       // Empty usernames should always fail, despite what the validator says...
 
-      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3', '4' };
       credentials = convertToUTF8Bytes(password);
 
       try
@@ -716,7 +736,7 @@ public class UserRegistrationTest
 
       // Regular user names should still be accepted...
 
-      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+      password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', 'd', 'r', 'o', 'w' };
       credentials = convertToUTF8Bytes(password);
 
       try
@@ -770,6 +790,8 @@ public class UserRegistrationTest
 
   @Test public void testCopyCtor() throws Exception
   {
+    UserRegistration.setCredentialsSizeConstraint(4, 4);
+
     UserRegistration ur1 = new UserRegistration(
         "abc", "me@somewhere.country", "pass".getBytes(UserRegistration.UTF8)
     );
