@@ -92,6 +92,10 @@ public class UserRegistrationTest
   {
     User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
     User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
+    UserRegistration.setCredentialsSizeConstraint(
+        UserRegistration.DEFAULT_CREDENTIALS_MIN_LEN,
+        UserRegistration.DEFAULT_CREDENTIALS_MAX_LEN
+    );
   }
 
 
