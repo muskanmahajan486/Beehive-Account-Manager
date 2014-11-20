@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openremote.model.data.json.UserTransformer;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
@@ -99,7 +100,7 @@ public class UserRegistrationTest
   }
 
 
-  // Constructor Tests ----------------------------------------------------------------------------
+  // Base Constructor Tests -----------------------------------------------------------------------
 
   /**
    * Basic constructor tests.
@@ -188,6 +189,8 @@ public class UserRegistrationTest
     }
   }
 
+
+  // Base Constructor Email Validation Tests ------------------------------------------------------
 
   /**
    * Test email validation in constructor, invalid host.
@@ -429,6 +432,87 @@ public class UserRegistrationTest
   }
 
 
+  /**
+   * Test email field values that exceed the serialization and database schema length limit.
+   */
+  @Test (expectedExceptions = Model.ValidationException.class)
+
+  public void testOverlongEmailInConstructor() throws Exception
+  {
+    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2' };
+    byte[] credentials = convertToUTF8Bytes(password);
+
+    StringBuilder b = new StringBuilder();
+    b.append("a@b.");
+
+    int size = b.length();
+
+    for (int i = 0; i <= Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT - size; ++i)
+    {
+      b.append('c');
+    }
+
+    String email = b.toString();
+
+    try
+    {
+      new UserRegistration("abc", email, credentials);
+    }
+
+    finally
+    {
+      clear(credentials);
+    }
+  }
+
+
+  /**
+   * Test email field values that exceed the serialization and database schema length limit
+   * (with custom validator)
+   */
+  @Test (expectedExceptions = Model.ValidationException.class)
+
+  public void testOverlongEmailCustomValidatorInConstructor() throws Exception
+  {
+    char[] password = new char[] { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2' };
+    byte[] credentials = convertToUTF8Bytes(password);
+
+    User.setEmailValidator(new Model.Validator<String>()
+    {
+      @Override public void validate(String s) throws Model.ValidationException
+      {
+        // accept everything...
+      }
+    });
+
+    StringBuilder b = new StringBuilder();
+    b.append("a@b.");
+
+    int size = b.length();
+
+    for (int i = 0; i <= Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT - size; ++i)
+    {
+      b.append('c');
+    }
+
+    String email = b.toString();
+
+    try
+    {
+      new UserRegistration("abc", email, credentials);
+    }
+
+    finally
+    {
+      clear(credentials);
+
+      User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
+    }
+  }
+
+
+  // Base Constructor Name Validation Tests -------------------------------------------------------
+  
   /**
    * Tests constructor with default username validator.
    */
