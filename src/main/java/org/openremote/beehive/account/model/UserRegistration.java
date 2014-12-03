@@ -20,26 +20,44 @@
  */
 package org.openremote.beehive.account.model;
 
+import java.io.Reader;
+import java.lang.annotation.ElementType;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.constraints.NotNull;
+
 import org.bouncycastle.crypto.generators.SCrypt;
-import org.bouncycastle.util.encoders.Base64;
+
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
+import org.hibernate.validator.cfg.defs.SizeDef;
 import org.openremote.base.Version;
 import org.openremote.base.exception.IncorrectImplementationException;
+
+import org.openremote.model.Model;
 import org.openremote.model.User;
 import org.openremote.model.data.json.UserTransformer;
 
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.util.Map;
 
 /**
  * This domain object extends the class {@link org.openremote.model.User} from OpenRemote object
- * model with user details that are transferred between processes as part of the registration
+ * model with user details that are transferred between services as part of the registration
  * process. In particular, it adds fields that would normally not traverse between systems
  * after the registration process is complete. <p>
  *
  * This implementation is specific to this Beehive Account Manager implementation, and therefore
  * not part of the shared OpenRemote object model. Account and user registrations should occur
- * through the Account Manager service. The account service can then delegate relevant
+ * through this Account Manager service. The account service can then delegate relevant
  * registration information and manage registration processes further in the back-end systems.
  *
  * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
@@ -49,6 +67,9 @@ public class UserRegistration extends User
 
   // Constants ------------------------------------------------------------------------------------
 
+  /**
+   * Default character set used in string-to-byte conversions.
+   */
   public static final Charset UTF8 = Charset.forName("UTF-8");
 
   /**
