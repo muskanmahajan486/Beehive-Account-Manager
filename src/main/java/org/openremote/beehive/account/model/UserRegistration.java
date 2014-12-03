@@ -51,7 +51,112 @@ public class UserRegistration extends User
 
   public static final Charset UTF8 = Charset.forName("UTF-8");
 
-  public static final String SALT_PADDING = "ORSaltPadding";
+  /**
+   * Default credentials minimum length constraint for user registrations: {@value}
+   */
+  public static final int DEFAULT_CREDENTIALS_MIN_LEN = 10;
+
+  /**
+   * Default credentials maximum length, equaling to the database schema and serialization
+   * schema maximums defined in {@link Model#DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT}: {@value}
+   */
+  public static final int DEFAULT_CREDENTIALS_MAX_LEN =
+      Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT;
+
+
+  private static final String SALT_PADDING = "ORSaltPadding"; // TODO : store salt in DB
+
+
+
+  // Class Initializers ---------------------------------------------------------------------------
+
+  static
+  {
+    try
+    {
+      setCredentialsSizeConstraint(DEFAULT_CREDENTIALS_MIN_LEN, DEFAULT_CREDENTIALS_MAX_LEN);
+    }
+
+    catch (Throwable t)
+    {
+      t.printStackTrace(); // todo log
+    }
+  }
+
+
+  // Class Members --------------------------------------------------------------------------------
+
+  private static javax.validation.Validator validator;
+
+
+  public static void setCredentialsSizeConstraint(int min, int max)
+  {
+    if (min < 0 || max > Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+    {
+      // TODO : log
+      return;
+    }
+
+    setCredentialsConstraint(new SizeDef().min(min).max(max));
+  }
+
+  public static void setCredentialsConstraint(ConstraintDef... constraints)
+  {
+    HibernateValidatorConfiguration config =
+        Validation.byProvider(HibernateValidator.class).configure();
+
+    ConstraintMapping credentialsMapping = config.createConstraintMapping();
+
+    PropertyConstraintMappingContext property = credentialsMapping
+        .type(UserRegistration.class)
+        .property("credentials", ElementType.FIELD);
+
+    for (ConstraintDef c : constraints)
+    {
+      property.constraint(c);
+    }
+
+    config.addMapping(credentialsMapping);
+
+    validator = config.buildValidatorFactory().getValidator();
+  }
+
+
+  /**
+   * Converts character array to UTF8 bytes without relying on String.getBytes(). Array is
+   * cleared when this method is done.
+   */
+  public static byte[] convertToUTF8Bytes(char[] array)
+  {
+    CharBuffer chars = CharBuffer.wrap(array);
+    ByteBuffer bytes = UserRegistration.UTF8.encode(chars);
+
+    byte[] buffer = Arrays.copyOf(bytes.array(), bytes.limit());
+
+    chars.clear();
+    bytes.clear();
+
+    clear(array);
+
+    return buffer;
+  }
+
+  public static void clear(char[] array)
+  {
+    for (char c : array)
+    {
+      c = 0;
+    }
+  }
+
+  public static void clear(byte[] array)
+  {
+    for (byte b : array)
+    {
+      b = 0;
+    }
+  }
+
 
 
   // Instance Fields ------------------------------------------------------------------------------
