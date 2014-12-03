@@ -182,7 +182,10 @@ public class UserRegistration extends User
 
   // Instance Fields ------------------------------------------------------------------------------
 
-  private transient byte[] credentials;
+  private @NotNull byte[] credentials;
+
+  private String salt; // TODO
+
 
 
   // Constructors ---------------------------------------------------------------------------------
