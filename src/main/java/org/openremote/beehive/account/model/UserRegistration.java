@@ -190,6 +190,25 @@ public class UserRegistration extends User
 
   // Constructors ---------------------------------------------------------------------------------
 
+  /**
+   * Creates a new user registration with a given user name, email and login credentials.
+   *
+   * @param username
+   *          A unique username in this account manager. The username must match the validation
+   *          constraints defined in {@link User#DEFAULT_NAME_VALIDATOR} or set in a custom
+   *          validator via {@link User#setNameValidator}. A username cannot be null or empty
+   *          string. The maximum
+   *
+   * @param email
+   *          An email address for the user (for registration confirmation, and such). Must be
+   *          a valid email as defined in {@link User#DEFAULT_EMAIL_VALIDATOR} or as set in a
+   *          custom validator via {@link User#DEFAULT_EMAIL_VALIDATOR}. The email validator
+   *          may be implemented to accept empty or null emails.
+   *
+   * @param credentials
+   *
+   * @throws ValidationException
+   */
   public UserRegistration(String username, String email, byte[] credentials)
       throws ValidationException
   {
