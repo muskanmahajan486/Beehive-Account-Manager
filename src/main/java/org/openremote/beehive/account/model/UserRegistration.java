@@ -217,6 +217,17 @@ public class UserRegistration extends User
     super.jsonTransformer = new RegistrationTransformer(credentials);
 
     this.credentials = credentials;
+
+    validate();
+  }
+
+
+  protected UserRegistration(UserRegistration copy)
+  {
+    this(
+        copy,
+        (copy == null) ? new byte[] {} : Arrays.copyOf(copy.credentials, copy.credentials.length)
+    );
   }
 
   private UserRegistration(User user, byte[] credentials)
@@ -226,6 +237,29 @@ public class UserRegistration extends User
     super.jsonTransformer = new RegistrationTransformer(credentials);
 
     this.credentials = credentials;
+  }
+
+
+
+
+  // Protected Instance Methods -------------------------------------------------------------------
+
+  protected void validate() throws ValidationException
+  {
+    Set<ConstraintViolation<UserRegistration>> errors = validator.validate(this);
+
+    if (!errors.isEmpty())
+    {
+      String messages = "";
+
+      for (ConstraintViolation violation : errors)
+      {
+        messages = messages + violation.getPropertyPath() + " ";
+        messages = messages + violation.getMessage();
+      }
+
+      throw new ValidationException(messages);
+    }
   }
 
 
