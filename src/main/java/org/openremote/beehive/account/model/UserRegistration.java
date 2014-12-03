@@ -384,7 +384,14 @@ public class UserRegistration extends User
       return SCrypt.generate(
           passphrase, salt, iterationCountN, hashBlockSize, parallelization, dkLen);
     }
+  }
 
+
+  // Enums ----------------------------------------------------------------------------------------
+
+  public enum CredentialsEncoding
+  {
+    SCRYPT
   }
 }
 
