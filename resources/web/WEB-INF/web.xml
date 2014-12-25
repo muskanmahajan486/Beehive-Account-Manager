@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  OpenRemote, the Home of the Digital Home.
-  Copyright 2008-2014, OpenRemote Inc.
-
-  See the contributors.txt file in the distribution for a full listing
-  of individual contributors.
+  Copyright 2013-2015, Juha Lindfors.
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU Affero General Public License as
@@ -46,6 +42,103 @@
          http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
   <display-name>OpenRemote Beehive Account Manager</display-name>
+
+
+  <!--
+  =================================================================================================
+
+    Servlet filters for request pre-processing and response post-processing
+
+  =================================================================================================
+  -->
+
+  <filter>
+    <description>
+      An automated JPA per-request transaction management
+    </description>
+
+    <filter-name>Transaction Management</filter-name>
+    <filter-class>EntityTransactionFilter</filter-class>
+
+    <!--
+     | Name of the persistence context used in the transaction management filter.
+     | This must be defined in the persistence.xml file.
+     +-->
+    <init-param>
+      <param-name>PersistenceContext</param-name>
+      <param-value>H2</param-value>
+    </init-param>
+
+    <!--
+     | OPTIONAL:  JPA JDBC driver standard persistence context property. This will override
+     |            the property defined in the persistence.xml for the persistence context,
+     |            if any is defined.
+     +-->
+    <init-param>
+      <param-name>javax.persistence.jdbc.driver</param-name>
+      <param-value>org.h2.Driver</param-value>
+    </init-param>
+
+    <!--
+     | OPTIONAL:  JPA JDBC URL standard persistence context property. This will override
+     |            the property defined in the persistence.xml for the persistence context,
+     |            if any is defined.
+     +-->
+    <init-param>
+      <param-name>javax.persistence.jdbc.url</param-name>
+      <param-value>jdbc:h2:~/AccountManager-UserRegistration-Test</param-value>
+    </init-param>
+
+    <!--
+     | OPTIONAL:  JPA JDBC user standard persistence context property. This will override
+     |            the property defined in the persistence.xml for persistence context,
+     |            if any is defined.
+     +-->
+    <init-param>
+      <param-name>javax.persistence.jdbc.user</param-name>
+      <param-value>sa</param-value>
+    </init-param>
+
+
+    <!--
+     | Other properties: add other properties for persistence context here, if you want to
+     |                   override the properties defined in the persistence.xml (and do not
+     |                   wish to modify the persistence.xml directly). E.g. hibernate specific
+     |                   properties:
+     |
+     |                     - hibernate.connection.pool_size
+     |                     - hibernate.cache.provider_class
+     |                     - hibernate.hbm2ddl.auto
+     |
+     |                   For each property, add a corresponding entry:
+     |
+     |                       <init-param>
+     |                         <param-name>name</param-name>
+     |                         <param-value>value</param-value>
+     |                       </init-param>
+     |
+     |                   Note that only properties starting with prefix 'javax.persistence.' or
+     |                   'hibernate.' are accepted.
+     +-->
+
+    <init-param>
+      <param-name>hibernate.dialect</param-name>
+      <param-value>org.hibernate.dialect.H2Dialect</param-value>
+    </init-param>
+
+  </filter>
+
+  <!--
+   | Apply transaction management to application servlet.
+   +-->
+  <filter-mapping>
+    <filter-name>Transaction Management</filter-name>
+    <servlet-name>Jersey Servlet Container for Beehive Account Manager</servlet-name>
+
+    <!-- Apply filter for requests originating from the client only -->
+    <dispatcher>REQUEST</dispatcher>
+
+  </filter-mapping>
 
 
   <!--
