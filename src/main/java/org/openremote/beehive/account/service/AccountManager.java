@@ -56,7 +56,6 @@ public class AccountManager extends Application
 
   public static final String ENTITY_MANAGER_LOOKUP = "EntityManager";
 
-  public static final String ENTITY_TX_LOOKUP = "EntityTransaction";
 
 
   // Class Members --------------------------------------------------------------------------------
@@ -189,7 +188,9 @@ public class AccountManager extends Application
   {
     TRANSACTION("Transaction"),
 
-    CREATE_USER("Rest.CreateUser");
+    CREATE_USER("Rest.CreateUser"),
+
+    CREATE_USER_DESERIALIZE("Rest.CreateUser.Deserialize");
 
 
     private String name;
