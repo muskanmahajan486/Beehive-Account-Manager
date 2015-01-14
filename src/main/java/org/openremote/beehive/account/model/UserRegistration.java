@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,33 +16,16 @@
  */
 package org.openremote.beehive.account.model;
 
-import java.io.Reader;
-import java.lang.annotation.ElementType;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.constraints.NotNull;
-
-import org.bouncycastle.crypto.generators.SCrypt;
-
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
-import org.hibernate.validator.cfg.defs.SizeDef;
-import org.openremote.base.Version;
-import org.openremote.base.exception.IncorrectImplementationException;
+import org.openremote.base.Defaults;
 
 import org.openremote.model.Model;
 import org.openremote.model.User;
 import org.openremote.model.data.json.UserTransformer;
+import org.openremote.model.persistence.jpa.RelationalUser;
 
 
 /**
@@ -60,7 +39,7 @@ import org.openremote.model.data.json.UserTransformer;
  * through this Account Manager service. The account service can then delegate relevant
  * registration information and manage registration processes further in the back-end systems.
  *
- * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
 public class UserRegistration extends User
 {
@@ -85,62 +64,60 @@ public class UserRegistration extends User
       Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT;
 
 
-  private static final String SALT_PADDING = "ORSaltPadding"; // TODO : store salt in DB
-
 
 
   // Class Initializers ---------------------------------------------------------------------------
-
-  static
-  {
-    try
-    {
-      setCredentialsSizeConstraint(DEFAULT_CREDENTIALS_MIN_LEN, DEFAULT_CREDENTIALS_MAX_LEN);
-    }
-
-    catch (Throwable t)
-    {
-      t.printStackTrace(); // todo log
-    }
-  }
+//
+//  static
+//  {
+//    try
+//    {
+//      setCredentialsSizeConstraint(DEFAULT_CREDENTIALS_MIN_LEN, DEFAULT_CREDENTIALS_MAX_LEN);
+//    }
+//
+//    catch (Throwable t)
+//    {
+//      t.printStackTrace(); // todo log
+//    }
+//  }
 
 
   // Class Members --------------------------------------------------------------------------------
 
-  private static javax.validation.Validator validator;
-
-
-  public static void setCredentialsSizeConstraint(int min, int max)
-  {
-    if (min < 0 || max > Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
-    {
-      // TODO : log
-      return;
-    }
-
-    setCredentialsConstraint(new SizeDef().min(min).max(max));
-  }
-
-  public static void setCredentialsConstraint(ConstraintDef... constraints)
-  {
-    HibernateValidatorConfiguration config =
-        Validation.byProvider(HibernateValidator.class).configure();
-
-    ConstraintMapping credentialsMapping = config.createConstraintMapping();
-
-    PropertyConstraintMappingContext property = credentialsMapping
-        .type(UserRegistration.class)
-        .property("credentials", ElementType.FIELD);
-
-    for (ConstraintDef c : constraints)
-    {
-      property.constraint(c);
-    }
-
-    config.addMapping(credentialsMapping);
-
-    validator = config.buildValidatorFactory().getValidator();
-  }
+//  private static javax.validation.Validator validator;
+//
+//
+//  public static void setCredentialsSizeConstraint(int min, int max)
+//  {
+//    if (min < 0 || max > Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+//    {
+//      // TODO : log
+//      return;
+//    }
+//
+//    setCredentialsConstraint(new SizeDef().min(min).max(max));
+//  }
+//
+//  public static void setCredentialsConstraint(ConstraintDef... constraints)
+//  {
+//    HibernateValidatorConfiguration config =
+//        Validation.byProvider(HibernateValidator.class).configure();
+//
+//    ConstraintMapping credentialsMapping = config.createConstraintMapping();
+//
+//    PropertyConstraintMappingContext property = credentialsMapping
+//        .type(UserRegistration.class)
+//        .property("credentials", ElementType.FIELD);
+//
+//    for (ConstraintDef c : constraints)
+//    {
+//      property.constraint(c);
+//    }
+//
+//    config.addMapping(credentialsMapping);
+//
+//    validator = config.buildValidatorFactory().getValidator();
+//  }
 
 
   /**
@@ -177,14 +154,6 @@ public class UserRegistration extends User
       b = 0;
     }
   }
-
-
-
-  // Instance Fields ------------------------------------------------------------------------------
-
-  private @NotNull byte[] credentials;
-
-  private String salt; // TODO
 
 
 
