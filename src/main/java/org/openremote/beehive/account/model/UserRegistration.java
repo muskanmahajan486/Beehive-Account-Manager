@@ -43,19 +43,19 @@ public class UserRegistration extends User
 {
 
   // Constants ------------------------------------------------------------------------------------
-
-  /**
-   * Default credentials minimum length constraint for user registrations: {@value}
-   */
-  public static final int DEFAULT_CREDENTIALS_MIN_LEN = 10;
-
-  /**
-   * Default credentials maximum length, equaling to the database schema and serialization
-   * schema maximums defined in {@link Model#DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT}: {@value}
-   */
-  public static final int DEFAULT_CREDENTIALS_MAX_LEN =
-      Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT;
-
+//
+//  /**
+//   * Default credentials minimum length constraint for user registrations: {@value}
+//   */
+//  public static final int DEFAULT_CREDENTIALS_MIN_LEN = 10;
+//
+//  /**
+//   * Default credentials maximum length, equaling to the database schema and serialization
+//   * schema maximums defined in {@link Model#DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT}: {@value}
+//   */
+//  public static final int DEFAULT_CREDENTIALS_MAX_LEN =
+//      Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT;
+//
 
 
 
