@@ -47,11 +47,6 @@ public class UserRegistration extends User
   // Constants ------------------------------------------------------------------------------------
 
   /**
-   * Default character set used in string-to-byte conversions.
-   */
-  public static final Charset UTF8 = Charset.forName("UTF-8");
-
-  /**
    * Default credentials minimum length constraint for user registrations: {@value}
    */
   public static final int DEFAULT_CREDENTIALS_MIN_LEN = 10;
@@ -84,6 +79,11 @@ public class UserRegistration extends User
 
   // Class Members --------------------------------------------------------------------------------
 
+//
+// TODO :
+//        the validation needs to be implemented in Object Model User class' addAttribute
+//        and then in relational entity's authentication object.
+//
 //  private static javax.validation.Validator validator;
 //
 //
@@ -174,7 +174,7 @@ public class UserRegistration extends User
    *          custom validator via {@link User#DEFAULT_EMAIL_VALIDATOR}. The email validator
    *          may be implemented to accept empty or null emails.
    *
-   * @param credentials
+   * @param credentials TODO
    *
    * @throws ValidationException
    */
@@ -183,9 +183,15 @@ public class UserRegistration extends User
   {
     super(username, email);
 
-    super.jsonTransformer = new RegistrationTransformer(credentials);
+    addAttribute(
+        User.CREDENTIALS_ATTRIBUTE_NAME,
+        (credentials == null) ? "" : new String(credentials)
+    );
 
-    this.credentials = credentials;
+    addAttribute(
+        User.AUTHMODE_ATTRIBUTE_NAME,
+        User.CredentialsEncoding.SCRYPT.getEncodingName()
+    );
 
     validate();
   }
