@@ -7,6 +7,9 @@
   "model": {
     "username": "foo",
     "email": "email@host.domain",
-    "credentials": "secret"
+    "userAttributes": {
+      "authMode": "scrypt",
+      "credentials": "secret"
+    }
   }
 }
