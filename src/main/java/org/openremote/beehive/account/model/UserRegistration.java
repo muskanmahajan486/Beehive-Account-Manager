@@ -24,8 +24,6 @@ import org.openremote.base.Defaults;
 
 import org.openremote.model.Model;
 import org.openremote.model.User;
-import org.openremote.model.data.json.UserTransformer;
-import org.openremote.model.persistence.jpa.RelationalUser;
 
 
 /**
@@ -156,6 +154,12 @@ public class UserRegistration extends User
   }
 
 
+  private static byte[] extractAuthCredentials(Authentication auth)
+  {
+    return new UserAuthentication(auth).credentials;
+  }
+
+
 
   // Constructors ---------------------------------------------------------------------------------
 
@@ -197,49 +201,49 @@ public class UserRegistration extends User
   }
 
 
+  // TODO : review
+
   protected UserRegistration(UserRegistration copy)
   {
     this(
         copy,
-        (copy == null) ? new byte[] {} : Arrays.copyOf(copy.credentials, copy.credentials.length)
+        (copy == null)
+            ? null
+            : copy.getAttribute(User.CREDENTIALS_ATTRIBUTE_NAME).getBytes(Defaults.DEFAULT_CHARSET)
     );
   }
+
+  // TODO : review
 
   private UserRegistration(User user, byte[] credentials)
   {
     super(user);
 
-    super.jsonTransformer = new RegistrationTransformer(credentials);
+    addAttribute(
+        User.CREDENTIALS_ATTRIBUTE_NAME,
+        (credentials == null) ? "" : new String(credentials)
+    );
 
-    this.credentials = credentials;
+    addAttribute(
+        User.AUTHMODE_ATTRIBUTE_NAME,
+        User.CredentialsEncoding.SCRYPT.getEncodingName()
+    );
   }
 
+  // TODO : review
 
-
-
-  // Protected Instance Methods -------------------------------------------------------------------
-
-  protected void validate() throws ValidationException
+  public UserRegistration(User user, Authentication authentication)
   {
-    Set<ConstraintViolation<UserRegistration>> errors = validator.validate(this);
+    this(user, extractAuthCredentials(authentication));
 
-    if (!errors.isEmpty())
-    {
-      String messages = "";
+    UserAuthentication auth = new UserAuthentication(authentication);
 
-      for (ConstraintViolation violation : errors)
-      {
-        messages = messages + violation.getPropertyPath() + " ";
-        messages = messages + violation.getMessage();
-      }
+    addAttribute(User.AUTHMODE_ATTRIBUTE_NAME, auth.encoding.getEncodingName());
 
-      throw new ValidationException(messages);
-    }
   }
 
 
-  // Nested Classes -------------------------------------------------------------------------------
-
+  // Object Overrides -----------------------------------------------------------------------------
 
   /**
    * Extends the {@link org.openremote.model.User} object's JSON transformer implementation to
