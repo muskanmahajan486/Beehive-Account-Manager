@@ -20,15 +20,13 @@
  */
 package org.openremote.beehive.account.service;
 
-import org.openremote.beehive.account.model.CustomerFulfillment;
-import org.openremote.beehive.account.model.UserRegistration;
-import org.openremote.logging.Logger;
-import org.openremote.model.data.json.JSONTransformer;
-import org.openremote.model.persistence.jpa.RelationalAccount;
-import org.openremote.model.persistence.jpa.RelationalUser;
+import java.util.Locale;
 
 import javax.persistence.EntityManager;
+
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -46,6 +44,12 @@ import javax.ws.rs.core.SecurityContext;
 
 public class CreateAccount
 {
+
+  // Constants ------------------------------------------------------------------------------------
+
+
+  public static final String WEBAPP_PARAM_SERVICE_DB_SCHEMA = "ServiceSchema";
+
 
   // Class Members --------------------------------------------------------------------------------
 
