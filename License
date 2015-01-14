@@ -1,12 +1,6 @@
-OpenRemote, the Home of the Digital Home.
-Copyright 2008-2014, OpenRemote Inc.
-
-OpenRemote is trademark of OpenRemote, Inc.
-
-See the contributors.txt file in the distribution for a
-full listing of individual contributors.
-
-OpenRemote is free software: you can redistribute it and/or modify
+Copyright 2013-2015, Juha Lindfors. All rights reserved.
+ 
+This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
@@ -19,9 +13,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Individual sub-components of OpenRemote may be licensed under other,
-compatible licenses. These components are listed and their licenses 
-included in this file.
+Individual sub-components may be licensed under other, compatible 
+licenses. These components are listed and their licenses included in 
+this file.
 
 
                     GNU AFFERO GENERAL PUBLIC LICENSE
@@ -689,7 +683,11 @@ For more information on this, and how to apply and follow the GNU AGPL, see
 
 ===========================================================================
 
-OpenRemote Sub-components:
+Sub-components:
+
+* Object model, object model persistence and object model legacy beehive
+  libraries are licensed under GNU Affero General Public License (AGPL)
+  Version 3 or any later version.
 
 * Javassist 3.18.1 library is a multi-licensed with Mozilla Public License 
   (MPL) Version 1.1, GNU Lesser General Public License (LGPL) Version 2.1 
