@@ -201,12 +201,14 @@ public class CreateAccount
   }
 
 
-  // Private Instance Methods ---------------------------------------------------------------------
+  // Enums ----------------------------------------------------------------------------------------
 
-  private EntityManager getEntityManager()
+  private enum Schema
   {
-    return (EntityManager)request.getAttribute(AccountManager.ENTITY_MANAGER_LOOKUP);
+    LEGACY_BEEHIVE,
+    ACCOUNT_MANAGER_2_0
   }
+
 
 }
 
