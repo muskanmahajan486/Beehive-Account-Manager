@@ -138,27 +138,67 @@ public class CreateAccount
 
     // TODO check/test for duplicate user names
 
-    em.persist(user);
+    try
+    {
+      return  createPersistentUserAccount(resolveDBSchema(), registration);
+    }
 
-    log.info(
-        "CREATE ACCOUNT: [Service admin: ''{0}''] created new account for user ''{1}''.",
-        security.getUserPrincipal().getName(), user.getName()
-    );
+    catch (Model.ValidationException exception)
+    {
+      throw new DeserializationException(
+          "Incorrect user data: {0}", exception, exception.getMessage()
+      );
+    }
   }
 
-  @POST public void create(CustomerFulfillment fulfillment)
+
+  private EntityManager getEntityManager()
   {
-    throw new RuntimeException("Not implemented yet.");
+    return (EntityManager)request.getAttribute(AccountManager.ENTITY_MANAGER_LOOKUP);
   }
 
 
-  /*
-  @POST @Consumes({MediaType.TEXT_XML, MediaType.APPLICATION_XML})
-  public void create(UserRegistration reg, boolean xml) throws Exception
+  private User createPersistentUserAccount(Schema schema, UserRegistration registration)
+      throws Model.ValidationException
   {
-    throw new RuntimeException("Not implemented yet.");
+    EntityManager em = getEntityManager();
+
+    RelationalAccount acct = new RelationalAccount();
+
+    switch (schema)
+    {
+
+      case LEGACY_BEEHIVE:
+
+        BeehiveUser beehiveUser = new BeehiveUser(
+            acct, registration,
+            registration.getAttribute(User.CREDENTIALS_ATTRIBUTE_NAME).getBytes(Defaults.UTF8)
+        );
+
+        beehiveUser.link(acct);
+
+        em.persist(acct);
+        em.persist(beehiveUser);
+
+        return beehiveUser;
+
+      case ACCOUNT_MANAGER_2_0:
+
+        RelationalUser user = new RelationalUser(registration);
+
+        user.link(acct);
+
+        em.persist(acct);
+        em.persist(user);
+
+        return user;
+
+
+      default:
+
+        throw new IncorrectImplementationException("Incorrect schema identifier: {0}", schema);
+    }
   }
-  */
 
 
   // Private Instance Methods ---------------------------------------------------------------------
