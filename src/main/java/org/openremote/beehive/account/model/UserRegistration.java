@@ -275,20 +275,14 @@ public class UserRegistration extends User
   // Nested Classes -------------------------------------------------------------------------------
 
 
-    // Private Instance Methods -------------------------------------------------------------------
+  private static class UserAuthentication extends Authentication
+  {
+    private byte[] credentials = super.getCredentials();
+    private CredentialsEncoding encoding = super.encoding;
 
-    // http://www.tarsnap.com/scrypt/scrypt.pdf
-    private byte[] scrypt(User user, byte[] passphrase)
+    private UserAuthentication(Authentication copy)
     {
-      byte[] salt = (user.getName() + SALT_PADDING).getBytes(UTF8);
-
-      int iterationCountN = 16384;    // 2^14 (< 100 ms), general work factor (2^20 for ~5s)
-      int hashBlockSize = 8;          // relative memory cost
-      int parallelization = 1;        // CPU cost
-      int dkLen = 127;                // length of the result key
-
-      return SCrypt.generate(
-          passphrase, salt, iterationCountN, hashBlockSize, parallelization, dkLen);
+      super(copy);
     }
   }
 
