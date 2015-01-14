@@ -131,18 +131,12 @@ public class CreateAccount
   {
     if (registration == null)
     {
-      throw new JSONTransformer.DeserializationException(
+      throw new DeserializationException(
           "User registration JSON representation was not correctly deserialized."
       );
     }
 
-    EntityManager em = getEntityManager();
-
-    RelationalAccount account = new RelationalAccount();
-    em.persist(account);
-
-    RelationalUser user = new RelationalUser(registration);
-    user.link(account);
+    // TODO check/test for duplicate user names
 
     em.persist(user);
 
