@@ -43,6 +43,35 @@
 
   <display-name>OpenRemote Beehive Account Manager</display-name>
 
+  <!--
+  =================================================================================================
+
+    Web application initialization parameters.
+
+  =================================================================================================
+  -->
+
+
+  <!--
+   | Optional parameter to indicate which database schema is used to store account data.
+   | If omitted, assumes Beehive Account Manager 2.0 schema.
+   |
+   | Valid values are:
+   |   - Account_Manager_2_0
+   |   - Legacy_Beehive
+   |
+   | The legacy Beehive schema corresponds to the Beehive version 3.0 schema definition.
+   |
+   | When changing/modifying this value, adjust the JPA persistence context name accordingly
+   | to match to a persistence mapping configuration for the desired schema. For example,
+   | the default persistence configurations include persistence units with suffix
+   | '-LegacyBeehive' that map to a legacy Beehive 3.0 schema.
+   +-->
+  <context-param>
+    <param-name>ServiceSchema</param-name>
+    <param-value>Legacy_Beehive</param-value>
+  </context-param>
+
 
   <!--
   =================================================================================================
@@ -66,7 +95,7 @@
      +-->
     <init-param>
       <param-name>PersistenceContext</param-name>
-      <param-value>H2</param-value>
+      <param-value>H2-LegacyBeehive</param-value>
     </init-param>
 
     <!--
