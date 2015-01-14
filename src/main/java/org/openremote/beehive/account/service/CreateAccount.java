@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -34,10 +30,28 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 
+import org.openremote.base.Defaults;
+import org.openremote.base.exception.IncorrectImplementationException;
+
+import org.openremote.logging.Logger;
+
+import org.openremote.model.Model;
+import org.openremote.model.User;
+import org.openremote.model.data.json.DeserializationException;
+import org.openremote.model.persistence.jpa.RelationalAccount;
+import org.openremote.model.persistence.jpa.RelationalUser;
+import org.openremote.model.persistence.jpa.beehive.BeehiveUser;
+
+import org.openremote.beehive.account.model.UserRegistration;
+import org.openremote.beehive.account.model.rest.UserRegistrationReader;
+
+
+
+
 /**
- * TODO
+ * Beehive Account Manager REST API for creating new account instances.
  *
- * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
 
 @Path("users")
@@ -62,12 +76,58 @@ public class CreateAccount
 
   @Context private HttpServletRequest request;
 
+  @Context private ServletContext webapp;
 
 
   // REST API Implementation ----------------------------------------------------------------------
 
   @Consumes({ MediaType.APPLICATION_JSON })
-  @POST public void create(UserRegistration registration) throws Exception
+
+  @POST public void create(UserRegistration registration) throws DeserializationException
+  {
+    User user = createUserAccount(registration);
+
+    log.info(
+        "CREATE ACCOUNT: [Service admin: ''{0}''] created new account for user ''{1}''.",
+        security.getUserPrincipal().getName(), user.getName()
+    );
+  }
+
+
+  // TODO: @POST @Consumes({MediaType.TEXT_XML, MediaType.APPLICATION_XML})
+
+
+
+  // Private Instance Methods ---------------------------------------------------------------------
+
+  private Schema resolveDBSchema()
+  {
+    String dbSchemaParameter = webapp.getInitParameter(WEBAPP_PARAM_SERVICE_DB_SCHEMA);
+
+    if (dbSchemaParameter == null)
+    {
+       // TODO Log
+
+      return Schema.ACCOUNT_MANAGER_2_0;
+    }
+
+    dbSchemaParameter = dbSchemaParameter.toUpperCase(Locale.ENGLISH);
+
+    try
+    {
+      return Schema.valueOf(dbSchemaParameter);
+    }
+
+    catch (IllegalArgumentException e)
+    {
+      throw new UserRegistrationReader.InternalError(
+          "Invalid " + WEBAPP_PARAM_SERVICE_DB_SCHEMA + "value: " + dbSchemaParameter
+      );
+    }
+  }
+
+  private User createUserAccount(UserRegistration registration)
+      throws DeserializationException
   {
     if (registration == null)
     {
