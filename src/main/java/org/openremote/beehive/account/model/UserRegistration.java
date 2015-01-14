@@ -272,36 +272,7 @@ public class UserRegistration extends User
   }
 
 
-    /**
-     * Overridden to return instances of this class, as returned by the
-     * {@link #deserialize(org.openremote.base.Version, String, java.util.Map)} implementation.
-     *
-     * @param reader
-     *          input stream to deserialize this instance form
-     *
-     * @return  a new instance of this class
-     *
-     * @throws  DeserializationException
-     *            if read deserialization fails
-     */
-    @Override public UserRegistration read(Reader reader) throws DeserializationException
-    {
-      // We know it is an instance of this class since we implement it as such in the
-      // deserialize method above. Just need to remember to make changes on both methods
-      // if the type ever changes...
-
-      try
-      {
-        return (UserRegistration) super.read(reader);
-      }
-
-      catch (ClassCastException e)
-      {
-        throw new IncorrectImplementationException(
-            "Deserialization does not return expected ''UserRegistration'' type."
-        );
-      }
-    }
+  // Nested Classes -------------------------------------------------------------------------------
 
 
     // Private Instance Methods -------------------------------------------------------------------
