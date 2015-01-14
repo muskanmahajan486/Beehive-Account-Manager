@@ -245,69 +245,13 @@ public class UserRegistration extends User
 
   // Object Overrides -----------------------------------------------------------------------------
 
-  /**
-   * Extends the {@link org.openremote.model.User} object's JSON transformer implementation to
-   * manage the serialization of additional data fields that are only present at the registration
-   * phase.
-   */
-  public static class RegistrationTransformer extends UserTransformer
+  @Override public String toString()
   {
-
-    // Instance Fields ----------------------------------------------------------------------------
-
-    private transient byte[] credentials;
+    return "User: " + username + ", " + email;
+  }
 
 
-    // Constructors -------------------------------------------------------------------------------
-
-    public RegistrationTransformer()
-    {
-
-    }
-
-    private RegistrationTransformer(byte[] credentials)
-    {
-      this.credentials = credentials;
-    }
-
-
-    // Overrides UserTransformer ------------------------------------------------------------------
-
-    /**
-     * This is an implementation of the property field extension mechanism provided by the
-     * super class in {@link org.openremote.model.data.json.UserTransformer}. It adds a
-     * 'credentials' field to the serialized JSON document sent to a service end-point. <p>
-     *
-     * For the purpose of the serialization, credentials bytes are converted to an
-     * {@link UserRegistration#UTF8} string.
-     *
-     * @param user
-     */
-    @Override protected void writeExtendedProperties(User user)
-    {
-      writeProperty("credentials", new String(credentials, UTF8));
-    }
-
-
-    /**
-     * Deserializes this instance as an extension of {@link org.openremote.model.User} object.
-     *
-     * @param schemaVersion
-     * @param className
-     * @param jsonProperties
-     *
-     * @return
-     *
-     * @throws DeserializationException
-     */
-    @Override protected UserRegistration deserialize(Version schemaVersion,
-                                                     String className,
-                                                     Map<String, String> jsonProperties)
-        throws DeserializationException
-    {
-      // Let superclass deserialize itself first...
-
-      User user = super.deserialize(schemaVersion, User.class.getName(), jsonProperties);
+  // Protected Instance Methods -------------------------------------------------------------------
 
       // Create an instance of this with additional properties...
 
