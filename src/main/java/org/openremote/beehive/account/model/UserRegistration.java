@@ -253,12 +253,24 @@ public class UserRegistration extends User
 
   // Protected Instance Methods -------------------------------------------------------------------
 
-      // Create an instance of this with additional properties...
+  protected void validate() throws ValidationException
+  {
+//    Set<ConstraintViolation<UserRegistration>> errors = validator.validate(this);
+//
+//    if (!errors.isEmpty())
+//    {
+//      String messages = "";
+//
+//      for (ConstraintViolation violation : errors)
+//      {
+//        messages = messages + violation.getPropertyPath() + " ";
+//        messages = messages + violation.getMessage();
+//      }
+//
+//      throw new ValidationException(messages);
+//    }
+  }
 
-      return new UserRegistration(
-          user, scrypt(user, jsonProperties.get("credentials").getBytes(UTF8))
-      );
-    }
 
     /**
      * Overridden to return instances of this class, as returned by the
