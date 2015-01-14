@@ -292,12 +292,5 @@ public class UserRegistration extends User
     }
   }
 
-
-  // Enums ----------------------------------------------------------------------------------------
-
-  public enum CredentialsEncoding
-  {
-    SCRYPT
-  }
 }
 
