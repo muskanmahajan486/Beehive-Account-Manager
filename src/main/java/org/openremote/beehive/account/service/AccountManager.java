@@ -186,11 +186,13 @@ public class AccountManager extends Application
 
   public enum Log implements Hierarchy
   {
-    TRANSACTION("Transaction"),
+    TRANSACTION               ("Transaction"),
 
-    CREATE_USER("Rest.CreateUser"),
+    REGISTRATION              ("Rest.Registration"),
 
-    CREATE_USER_DESERIALIZE("Rest.CreateUser.Deserialize");
+    REGISTRATION_DESERIALIZE  ("Rest.Registration.Deserialize"),
+
+    FULFILLMENT_DESERIALIZE   ("Rest.Fulfillment.Deserialize");
 
 
     private String name;

@@ -77,6 +77,9 @@ public class CustomerFulfillmentReader implements MessageBodyReader<CustomerFulf
   {
     try
     {
+      // TODO : set upper limit to request document size.
+      // TODO : enforce a request timeout
+
       log.info("Deserializing customer fulfillment JSON document...");
 
       CustomerFulfillment.FulfillmentTransformer transformer =
