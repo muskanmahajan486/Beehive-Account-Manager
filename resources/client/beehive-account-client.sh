@@ -1,10 +1,6 @@
 #!/bin/sh
 #  --------------------------------------------------------------------
-#  OpenRemote, the Home of the Digital Home.
-#  Copyright 2008-2014, OpenRemote Inc.
-#
-#  See the contributors.txt file in the distribution for a full listing
-#  of individual contributors.
+#  Copyright 2013-2015, Juha Lindfors. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU Affero General Public License as
@@ -29,7 +25,7 @@
 #
 #  to view usage details.
 #
-#  Author: Juha Lindfors (juha@openremote.org)
+#  Author: Juha Lindfors
 #
 ##
 
@@ -37,9 +33,6 @@ function printHelp()
 {
   echo "";
   echo "-------------------------------------------------------------";
-  echo "";
-  echo "  OpenRemote, the Home of the Digital Home.";
-  echo "  Copyright 2008-2014, OpenRemote Inc.";
   echo "";
   echo "  Beehive Account Manager Client Utilities.";
   echo "";
@@ -77,10 +70,10 @@ fi
 
 # OpenRemote libs.
 CLASSPATH=BeehiveAccountClient-2.0.0.jar
-CLASSPATH="$CLASSPATH:lib/openremote-object-model-0.2.0_WIP.jar"
+CLASSPATH="$CLASSPATH:lib/object-model-0.2.0_WIP.jar"
 CLASSPATH="$CLASSPATH:lib/openremote-security-0.3.0.jar"
 
-# BouncyCastle libs for OpenRemote security.
+# BouncyCastle libs for security.
 CLASSPATH="$CLASSPATH:lib/bcprov-jdk15on-150.jar"
 CLASSPATH="$CLASSPATH:lib/bcpkix-jdk15on-150.jar"
 
