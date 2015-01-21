@@ -275,5 +275,27 @@ public class CustomerFulfillment extends UserRegistration
     }
   }
 
+
+
+  private static class UserAuthentication extends Authentication
+  {
+    private static byte[] getCredentials(User copy)
+    {
+      return copy.getAttribute(User.CREDENTIALS_ATTRIBUTE_NAME).getBytes(Defaults.UTF8);
+    }
+
+    private static CredentialsEncoding getAuthMode(User copy)
+    {
+      return CredentialsEncoding.valueOf(
+          copy.getAttribute(User.AUTHMODE_ATTRIBUTE_NAME).toUpperCase(Locale.ENGLISH)
+      );
+    }
+
+    private UserAuthentication(CustomerFulfillment copy)
+    {
+      super(getCredentials(copy), getAuthMode(copy));
+    }
+
+  }
 }
 
