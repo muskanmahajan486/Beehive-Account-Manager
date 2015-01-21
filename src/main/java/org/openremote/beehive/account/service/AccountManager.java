@@ -31,8 +31,10 @@ import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.openremote.beehive.account.model.rest.UserRegistrationReader;
 import org.openremote.logging.Hierarchy;
+
+import org.openremote.beehive.account.model.rest.CustomerFulfillmentReader;
+import org.openremote.beehive.account.model.rest.UserRegistrationReader;
 
 
 /**
@@ -44,8 +46,6 @@ import org.openremote.logging.Hierarchy;
  * This implementation uses the explicit resource registration via {@link #getClasses()} method
  * to support pre-Servlet 3.0 containers. It currently assumes a servlet container-based
  * deployment.
- *
- * TODO
  *
  * @author Juha Lindfors
  */
@@ -60,7 +60,7 @@ public class AccountManager extends Application
 
   // Class Members --------------------------------------------------------------------------------
 
-  private static final Set<Class<?>> resourceClasses = new HashSet<Class<?>>(5);
+  private static final Set<Class<?>> resourceClasses = new HashSet<Class<?>>(10);
 
   static
   {
@@ -75,6 +75,7 @@ public class AccountManager extends Application
   {
     providerClasses.add(UserAuthorization.class);
     providerClasses.add(UserRegistrationReader.class);
+    providerClasses.add(CustomerFulfillmentReader.class);
   }
 
 
@@ -84,7 +85,6 @@ public class AccountManager extends Application
   public AccountManager()
   {
     //System.setProperty("jersey.config.server.tracing.type", "ALL");
-
   }
 
 
