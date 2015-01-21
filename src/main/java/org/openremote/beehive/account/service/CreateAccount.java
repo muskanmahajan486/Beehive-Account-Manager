@@ -84,11 +84,30 @@ public class CreateAccount
 
   // REST API Implementation ----------------------------------------------------------------------
 
-  @Consumes({ MediaType.APPLICATION_JSON })
+  @Consumes( { MediaType.APPLICATION_JSON, UserRegistration.JSON_HTTP_CONTENT_TYPE } )
 
   @POST public void create(UserRegistration registration) throws DeserializationException
   {
-    User user = createUserAccount(registration);
+    RelationalAccount acct = createPersistentAccount();
+    User user = createUserAccount(acct, registration);
+
+    log.info(
+        "CREATE ACCOUNT: [Service admin: ''{0}''] created new account for user ''{1}''.",
+        security.getUserPrincipal().getName(), user.getName()
+    );
+  }
+
+
+  @Consumes(CustomerFulfillment.JSON_HTTP_CONTENT_TYPE)
+
+  @POST public void create(CustomerFulfillment fulfillment) throws DeserializationException
+  {
+    RelationalAccount acct = createPersistentAccount();
+    RelationalUser user = createUserAccount(acct, fulfillment);
+
+    ControllerData ctrlData = new ControllerData(fulfillment);
+
+    addController(resolveDBSchema(), acct, ctrlData.controller);
 
     log.info(
         "CREATE ACCOUNT: [Service admin: ''{0}''] created new account for user ''{1}''.",
