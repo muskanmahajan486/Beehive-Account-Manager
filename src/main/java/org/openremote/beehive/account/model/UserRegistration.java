@@ -22,12 +22,11 @@ import java.util.Arrays;
 
 import org.openremote.base.Defaults;
 
-import org.openremote.model.Model;
 import org.openremote.model.User;
 
 
 /**
- * This domain object extends the class {@link org.openremote.model.User} from OpenRemote object
+ * This domain object extends the class {@link org.openremote.model.User} from object
  * model with user details that are transferred between services as part of the registration
  * process. In particular, it adds fields that would normally not traverse between systems
  * after the registration process is complete. <p>
@@ -43,6 +42,12 @@ public class UserRegistration extends User
 {
 
   // Constants ------------------------------------------------------------------------------------
+
+
+  public static final String JSON_HTTP_CONTENT_TYPE =
+      "application/vnd.openremote.user-registration+json";
+
+
 //
 //  /**
 //   * Default credentials minimum length constraint for user registrations: {@value}
