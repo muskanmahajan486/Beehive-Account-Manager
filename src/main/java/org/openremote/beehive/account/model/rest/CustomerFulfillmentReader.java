@@ -85,7 +85,9 @@ public class CustomerFulfillmentReader implements MessageBodyReader<CustomerFulf
       CustomerFulfillment.FulfillmentTransformer transformer =
           new CustomerFulfillment.FulfillmentTransformer();
 
-      return (CustomerFulfillment)transformer.read(new BufferedReader(new InputStreamReader(entityStream)));
+      return (CustomerFulfillment)transformer.read(
+          new BufferedReader(new InputStreamReader(entityStream))
+      );
     }
 
     catch (DeserializationException exception)

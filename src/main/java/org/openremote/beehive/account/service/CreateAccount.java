@@ -84,7 +84,7 @@ public class CreateAccount
 
   // REST API Implementation ----------------------------------------------------------------------
 
-  @Consumes( { MediaType.APPLICATION_JSON, UserRegistration.JSON_HTTP_CONTENT_TYPE } )
+  @Consumes({ MediaType.APPLICATION_JSON, UserRegistration.JSON_HTTP_CONTENT_TYPE })
 
   @POST public void create(UserRegistration registration) throws DeserializationException
   {

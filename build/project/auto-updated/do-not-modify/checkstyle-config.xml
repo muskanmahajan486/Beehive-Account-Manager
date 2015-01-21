@@ -289,11 +289,4 @@
   <module name = "FileTabCharacter"/>
 
 
-  <!--
-   | Require header in each source file.
-   +-->
-  <module name="Header">
-      <property name="header" value="/*\n * OpenRemote, the Home of the Digital Home."/>
-  </module>
-
 </module>

@@ -61,7 +61,7 @@ import org.openremote.beehive.account.service.AccountManager;
  * @author Juha Lindfors
  */
 
-@Consumes ( { MediaType.APPLICATION_JSON, UserRegistration.JSON_HTTP_CONTENT_TYPE } )
+@Consumes ({ MediaType.APPLICATION_JSON, UserRegistration.JSON_HTTP_CONTENT_TYPE })
 
 public class UserRegistrationReader implements MessageBodyReader<UserRegistration>
 {
