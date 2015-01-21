@@ -22,6 +22,7 @@ import java.lang.reflect.Type;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.MessageFormat;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -222,9 +223,28 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
 
   public static class InternalError extends WebApplicationException
   {
+
+    public static String format(String msg, Object... params)
+    {
+      try
+      {
+        return MessageFormat.format(msg, params);
+      }
+
+      catch (Throwable cause)
+      {
+        return msg + "  [EXCEPTION MESSAGE FORMATTING ERROR: " + cause.getMessage().toUpperCase() + "]";
+      }
+    }
+
     public InternalError(String message)
     {
       this(null, message);
+    }
+
+    public InternalError(String message, Object... params)
+    {
+      this(format(message, params));
     }
 
     public InternalError(Throwable rootCause, final String message)
@@ -253,6 +273,7 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
 
       ).build());
     }
+
   }
 
 
