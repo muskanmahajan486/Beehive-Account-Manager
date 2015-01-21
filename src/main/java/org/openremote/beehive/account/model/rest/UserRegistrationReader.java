@@ -63,7 +63,7 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
 
   // Class Members --------------------------------------------------------------------------------
 
-  private static Logger log = Logger.getInstance(AccountManager.Log.CREATE_USER_DESERIALIZE);
+  private static Logger log = Logger.getInstance(AccountManager.Log.REGISTRATION_DESERIALIZE);
 
 
 
