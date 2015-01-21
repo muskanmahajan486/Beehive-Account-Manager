@@ -51,6 +51,10 @@ import org.openremote.beehive.account.service.AccountManager;
  * If the incoming JSON document cannot be interpreted, will return a HTTP error status 400 -
  * Bad Request. In case of any other errors will return status 500 -- Internal Server Error. <p>
  *
+ * Assumes the incoming request has a HTTP Content-Type of either "application/json"
+ * ({@link MediaType#APPLICATION_JSON}) or "application/vnd.openremote.user-registration+json"
+ * ({@link UserRegistration#JSON_HTTP_CONTENT_TYPE}).
+ *
  * If successful, will return a new instance of {@link UserRegistration}.
  *
  * @author Juha Lindfors
@@ -82,6 +86,9 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
   {
     try
     {
+      // TODO : set upper limit to request document size.
+      // TODO : enforce a request timeout
+
       log.info("Deserializing user registration JSON document...");
 
       // Deserialize default user from JSON stream...
@@ -106,6 +113,8 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
       );
 
       log.info("Deserialized registration for ''{0}''...", registration.toString());
+
+      // Done...
 
       return registration;
     }
