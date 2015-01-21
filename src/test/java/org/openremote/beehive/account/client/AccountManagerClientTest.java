@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,25 +16,36 @@
  */
 package org.openremote.beehive.account.client;
 
-import org.openremote.beehive.Tomcat;
-import org.openremote.beehive.account.model.UserRegistration;
-import org.openremote.security.KeyManager;
-import org.openremote.security.PrivateKeyManager;
-import org.openremote.security.SecurityProvider;
+import java.net.URL;
+
+import java.security.Security;
+
+import java.util.UUID;
+
+import javax.ws.rs.core.Response;
+
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.core.Response;
-import java.net.URL;
-import java.security.Security;
-import java.security.cert.Certificate;
+import org.openremote.base.Defaults;
+
+import org.openremote.security.SecurityProvider;
+
+import org.openremote.model.Controller;
+import org.openremote.model.User;
+
+import org.openremote.beehive.Tomcat;
+import org.openremote.beehive.account.model.CustomerFulfillment;
+import org.openremote.beehive.account.model.UserRegistration;
+
+
 
 /**
- * TODO
+ * Unit tests for {@link org.openremote.beehive.account.client.AccountManagerClient} implementation.
  *
- * @author <a href="mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
 public class AccountManagerClientTest
 {
@@ -46,15 +53,18 @@ public class AccountManagerClientTest
 
   // Constants ------------------------------------------------------------------------------------
 
+
   private static final String ADMIN_USERNAME = "admin";
 
   private static final String DEFAULT_USERNAME = "user";
 
-  private static final byte[] ADMIN_CREDENTIALS = "admin".getBytes();
+  private static final byte[] ADMIN_CREDENTIALS = "admin".getBytes(Defaults.UTF8);
 
-  private static final byte[] USER_CREDENTIALS = "user".getBytes();
+  private static final byte[] USER_CREDENTIALS = "user".getBytes(Defaults.UTF8);
 
   private static final URL DEFAULT_SERVICE_ROOT;
+
+
 
 
   // Class Initializers ---------------------------------------------------------------------------
@@ -150,22 +160,95 @@ public class AccountManagerClientTest
 
   // Tests ----------------------------------------------------------------------------------------
 
-  @Test public void testAdminCreateUser() throws Exception
+  @Test public void testAdminCreateUserRegistration() throws Exception
   {
-    Response response = defaultAdminClient.create(
-        new UserRegistration("newuser", null, "newcredentials".getBytes())
+    UserRegistration registration = new UserRegistration(
+        "testAdminCreateUserRegistration-" + UUID.randomUUID().toString(),
+        "email@some.com",
+        new byte[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' }
     );
 
+    Response response = defaultAdminClient.create(registration);
+
     Assert.assertTrue(
-        response.getStatus() == Response.Status.OK.getStatusCode(),
-        "Got " + response.getStatus()
+        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
     );
   }
+
+  @Test public void testAdminCreateUserWithExplicitAttributes() throws Exception
+  {
+    User user = new User(
+        "testAdminCreateUserWithExplicitAttributes-" + UUID.randomUUID().toString(),
+        "email@some.email.com"
+    );
+
+    user.addAttribute("credentials", "newcredentials1");
+
+    Response response = defaultAdminClient.create(user);
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
+    );
+  }
+
+
+  @Test public void testAdminCreateCustomerFulfillment() throws Exception
+  {
+    Controller ctrl = new Controller();
+    ctrl.addMacAddress("FF:FF:FF:FF:FF:00");
+    ctrl.addMacAddress("01:01:01:01:01:01");
+
+    CustomerFulfillment fulfillment = new CustomerFulfillment(
+        "testAdminCreateCUSTOMERFULFILLMENT-" + UUID.randomUUID().toString(),
+        "email@some.email.com",
+        new byte[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k' },
+        ctrl
+    );
+
+    Response response = defaultAdminClient.create(fulfillment);
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
+    );
+  }
+
+  @Test public void testAdminCreateMultipleUsers() throws Exception
+  {
+    testAdminCreateUserRegistration();
+    testAdminCreateUserRegistration();
+    testAdminCreateUserRegistration();
+    testAdminCreateUserRegistration();
+    testAdminCreateUserRegistration();
+  }
+
+  @Test public void testAdminCreateUserFulfillment() throws Exception
+  {
+    Controller controller = new Controller();
+    controller.addMacAddress(new int[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 });
+
+    CustomerFulfillment customer = new CustomerFulfillment(
+        "newuser2", "email@some2.email.test", "testpassword".getBytes(Defaults.UTF8),
+        controller
+    );
+
+    Response response = defaultAdminClient.create(customer);
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
+    );
+  }
+
+
+
 
   @Test public void testCreateUser() throws Exception
   {
     Response response = defaultUserClient.create(
-        new UserRegistration("newuser", null, "newcredentials".getBytes())
+        new UserRegistration("newuser2", null, "newcredentials2".getBytes(Defaults.UTF8))
     );
 
     Assert.assertTrue(
@@ -178,13 +261,13 @@ public class AccountManagerClientTest
   @Test public void testCreateUserWrongAuthenticationCredentials() throws Exception
   {
     AccountManagerClient client = new AccountManagerClient(
-        DEFAULT_SERVICE_ROOT, ADMIN_USERNAME, "INCORRECT_ADMIN_PASSWORD".getBytes()
+        DEFAULT_SERVICE_ROOT, ADMIN_USERNAME, "INCORRECT_ADMIN_PASSWORD".getBytes(Defaults.UTF8)
     );
 
     client.createTemporaryCertificateTrustStore(tomcat.getHttpsCertificate());
 
     Response response = client.create(
-        new UserRegistration("newuser", null, "newcredentials".getBytes())
+        new UserRegistration("newuser3", null, "newcredentials3".getBytes(Defaults.UTF8))
     );
 
     Assert.assertTrue(
@@ -192,6 +275,8 @@ public class AccountManagerClientTest
         "Got " + response.getStatus()
     );
   }
+
+
 
   @Test public void testAdminDeleteUser() throws Exception
   {
@@ -217,7 +302,7 @@ public class AccountManagerClientTest
   @Test public void testDeleteUserWrongAuthenticationCredentials() throws Exception
   {
     AccountManagerClient client = new AccountManagerClient(
-        DEFAULT_SERVICE_ROOT, ADMIN_USERNAME, "INCORRECT_ADMIN_PASSWORD".getBytes()
+        DEFAULT_SERVICE_ROOT, ADMIN_USERNAME, "INCORRECT_ADMIN_PASSWORD".getBytes(Defaults.UTF8)
     );
 
     client.createTemporaryCertificateTrustStore(tomcat.getHttpsCertificate());

@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  OpenRemote, the Home of the Digital Home.
-  Copyright 2008-2014, OpenRemote Inc.
-
-  See the contributors.txt file in the distribution for a full listing
-  of individual contributors.
+  Copyright 2013-2015, Juha Lindfors. All rights reserved.
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU Affero General Public License as
@@ -179,6 +175,7 @@
       <fileset dir = "resources/web"/>
     </copy>
 
+    
     <!-- Copy compiled classes into the WEB-INF/classes hierarchy... -->
 
     <copy todir = "${output.dir}/${war.name}-${release.version}/WEB-INF/classes" overwrite = "true">
@@ -259,7 +256,7 @@
         <exclude name = "LICENSE*"/>
       </fileset>
 
-      <fileset dir = "${lib.dir}/openremote-object-model-0.2.0">
+      <fileset dir = "${lib.dir}/object-model-0.2.0">
         <include name = "**/*.jar"/>
         <exclude name = "LICENSE*"/>
       </fileset>

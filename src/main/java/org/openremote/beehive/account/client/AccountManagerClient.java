@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,17 +16,21 @@
  */
 package org.openremote.beehive.account.client;
 
-import org.bouncycastle.util.encoders.Base64;
-import org.openremote.base.Version;
-import org.openremote.base.exception.InitializationException;
-import org.openremote.beehive.account.model.UserRegistration;
-import org.openremote.security.KeyManager;
-import org.openremote.security.PrivateKeyManager;
-import org.openremote.security.SecurityProvider;
-import org.openremote.security.TrustStore;
+import java.io.File;
+import java.io.FileInputStream;
+
+import java.net.URI;
+import java.net.URL;
+
+import java.nio.charset.Charset;
+
+import java.security.KeyStore;
+import java.security.Security;
+import java.security.cert.Certificate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -39,19 +39,27 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.URI;
-import java.net.URL;
-import java.security.KeyStore;
-import java.security.Security;
-import java.security.cert.Certificate;
+import org.bouncycastle.util.encoders.Base64;
+
+import org.openremote.base.Version;
+import org.openremote.base.exception.InitializationException;
+
+import org.openremote.security.KeyManager;
+import org.openremote.security.PrivateKeyManager;
+import org.openremote.security.SecurityProvider;
+import org.openremote.security.TrustStore;
+
+import org.openremote.model.User;
+
+import org.openremote.beehive.account.model.CustomerFulfillment;
+import org.openremote.beehive.account.model.UserRegistration;
+
+
 
 /**
  * TODO
  *
- * @author <a href="mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
 public class AccountManagerClient
 {
@@ -69,6 +77,8 @@ public class AccountManagerClient
   public static final String DEFAULT_PRIVATE_KEYSTORE_FILENAME = "tomcat-private.keystore";
 
   public static final String DEFAULT_TRUSTSTORE_FILENAME = "client.truststore";
+
+  public static final Charset UTF8 = Charset.forName("UTF-8");
 
 
   // Class Members --------------------------------------------------------------------------------
@@ -137,7 +147,7 @@ public class AccountManagerClient
     AccountManagerClient client = new AccountManagerClient(
         new URL(args[1]),
         username,
-        password.getBytes()
+        password.getBytes(UTF8)
     );
 
     File userHomeDir = new File(System.getProperty("user.home"));
@@ -157,7 +167,7 @@ public class AccountManagerClient
     System.out.println();
 
     Response response = client.create(
-        new UserRegistration(user, null, "Smb9324$#@#@$".getBytes())
+        new UserRegistration(user, null, "Smb9324$#@#@$".getBytes(UTF8))
     );
 
     System.out.println(response.getStatus() + ": " + response.getStatusInfo());
@@ -294,6 +304,13 @@ public class AccountManagerClient
   // Constructors ---------------------------------------------------------------------------------
 
 
+  /**
+   * TODO
+   *
+   * @param serviceRootURL
+   * @param username
+   * @param credentials
+   */
   public AccountManagerClient(URL serviceRootURL, String username, byte[] credentials)
   {
     this.serviceRootURL = serviceRootURL;
@@ -307,6 +324,15 @@ public class AccountManagerClient
   // Public Instance Methods ----------------------------------------------------------------------
 
 
+  public Response create(User user)
+  {
+    WebTarget target = constructTargetBase(createClient()).path("users");
+
+    Entity<String> jsonEntity = Entity.entity(user.toJSONString(), MediaType.APPLICATION_JSON);
+
+    return sendPost(target, jsonEntity);
+  }
+
   public Response create(UserRegistration user) throws Exception
   {
     WebTarget target = constructTargetBase(createClient()).path("users");
@@ -316,6 +342,16 @@ public class AccountManagerClient
     return sendPost(target, jsonEntity);
   }
 
+  public Response create(CustomerFulfillment fulfillment)
+  {
+    WebTarget target = constructTargetBase(createClient()).path("users");
+
+    Entity<String> jsonEntity = Entity.entity(
+        fulfillment.toJSONString(), CustomerFulfillment.JSON_HTTP_CONTENT_TYPE
+    );
+
+    return sendPost(target, jsonEntity);
+  }
 
   public Response retrieveAccountInfo(String username)
   {
@@ -405,7 +441,7 @@ public class AccountManagerClient
   {
     invocation.header(
         "Authorization",
-        "Basic " + new String(Base64.encode((username + ":" + new String(credentials)).getBytes()))
+        "Basic " + new String(Base64.encode((username + ":" + new String(credentials)).getBytes(UTF8)))
     );
   }
 
@@ -418,37 +454,37 @@ public class AccountManagerClient
     return invocationBuilder.delete();
   }
 
-
-  private Client createClient(File trustStore) throws InitializationException
-  {
-    ClientBuilder builder = ClientBuilder.newBuilder().hostnameVerifier(new HostnameVerifier()
-    {
-      public boolean verify(String s, SSLSession sslSession)
-      {
-        // TODO
-
-        return true;
-      }
-    });
-
-    try
-    {
-      KeyStore keystore = KeyStore.getInstance(DEFAULT_TRUST_STORE_FORMAT.getStorageName());
-      BufferedInputStream bin = new BufferedInputStream(new FileInputStream(trustStore));
-
-      keystore.load(bin, null);
-
-      builder = builder.trustStore(keystore);
-    }
-
-    catch (Exception exception)
-    {
-      throw new InitializationException("Error loading trust store: {0}", exception.getMessage());
-    }
-
-    return builder.build();
-  }
-
+//
+//  private Client createClient(File trustStore) throws InitializationException
+//  {
+//    ClientBuilder builder = ClientBuilder.newBuilder().hostnameVerifier(new HostnameVerifier()
+//    {
+//      public boolean verify(String s, SSLSession sslSession)
+//      {
+//        // TODO
+//
+//        return true;
+//      }
+//    });
+//
+//    try
+//    {
+//      KeyStore keystore = KeyStore.getInstance(DEFAULT_TRUST_STORE_FORMAT.getStorageName());
+//      BufferedInputStream bin = new BufferedInputStream(new FileInputStream(trustStore));
+//
+//      keystore.load(bin, null);
+//
+//      builder = builder.trustStore(keystore);
+//    }
+//
+//    catch (Exception exception)
+//    {
+//      throw new InitializationException("Error loading trust store: {0}", exception.getMessage());
+//    }
+//
+//    return builder.build();
+//  }
+//
 
   private WebTarget constructTargetBase(Client client)
   {
