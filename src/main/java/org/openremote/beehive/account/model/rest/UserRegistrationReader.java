@@ -31,12 +31,15 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
 
 import org.openremote.base.Defaults;
-import org.openremote.beehive.account.model.UserRegistration;
-import org.openremote.beehive.account.service.AccountManager;
+
 import org.openremote.logging.Logger;
+
 import org.openremote.model.User;
 import org.openremote.model.data.json.DeserializationException;
 import org.openremote.model.data.json.UserTransformer;
+
+import org.openremote.beehive.account.model.UserRegistration;
+import org.openremote.beehive.account.service.AccountManager;
 
 
 /**
@@ -53,7 +56,7 @@ import org.openremote.model.data.json.UserTransformer;
  * @author Juha Lindfors
  */
 
-@Consumes (MediaType.APPLICATION_JSON)
+@Consumes ( { MediaType.APPLICATION_JSON, UserRegistration.JSON_HTTP_CONTENT_TYPE } )
 
 public class UserRegistrationReader implements MessageBodyReader<UserRegistration>
 {
