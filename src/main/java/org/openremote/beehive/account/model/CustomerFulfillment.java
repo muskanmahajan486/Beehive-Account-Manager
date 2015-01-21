@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -84,6 +85,17 @@ public class CustomerFulfillment extends UserRegistration
 
     add(controller);
   }
+
+  protected CustomerFulfillment(CustomerFulfillment copy)
+  {
+    super(copy, new UserAuthentication(copy));
+
+    if (!copy.controllers.isEmpty())
+    {
+      this.controllers = new CopyOnWriteArraySet<Controller>(copy.controllers);
+    }
+  }
+
 
   private CustomerFulfillment(UserRegistration registration, Controller controller)
   {
