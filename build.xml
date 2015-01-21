@@ -154,7 +154,8 @@
    | PACKAGE:
    |
    | Creates a web archive (both compressed and expanded) of the Beehive account manager
-   | application for servlet container deployment.
+   | application for servlet container deployment, and client deployment libraries.
+
    +-->
   <target name = "package" extensionOf = "-after-unit-test" depends = "compile">
 
@@ -175,7 +176,7 @@
       <fileset dir = "resources/web"/>
     </copy>
 
-    
+
     <!-- Copy compiled classes into the WEB-INF/classes hierarchy... -->
 
     <copy todir = "${output.dir}/${war.name}-${release.version}/WEB-INF/classes" overwrite = "true">
@@ -257,7 +258,7 @@
       </fileset>
 
       <fileset dir = "${lib.dir}/object-model-0.2.0">
-        <include name = "**/*.jar"/>
+        <include name = "**/object-model-0*.jar"/>
         <exclude name = "LICENSE*"/>
       </fileset>
 
@@ -291,9 +292,9 @@
         <exclude name = "LICENSE*"/>
       </fileset>
 
-      <fileset dir = "${lib.dir}/jersey-core-2.6">
+      <fileset dir = "${lib.dir}/jersey-core-2.6" excludes = "jersey-server-*.jar" >
         <include name = "**/*.jar"/>
-        <exclude name = "LICENSE*|jersey-server*"/>
+        <exclude name = "LICENSE*"/>
       </fileset>
 
     </copy>
