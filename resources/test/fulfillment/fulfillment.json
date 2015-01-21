@@ -1,0 +1,28 @@
+{
+    "libraryName": "OpenRemote Object Model",
+    "javaFullClassName": "org.openremote.beehive.account.model.CustomerFulfillment",
+    "schemaVersion": "2.0.0",
+    "apiVersion": "0.2",
+    "model": {
+        "username": "testCustomerFulfillmentJSON",
+        "email": "email@somewhere.com",
+        "controllers": [
+            {
+                "libraryName": "OpenRemote Object Model",
+                "javaFullClassName": "org.openremote.model.Controller",
+                "schemaVersion": "4.0.0",
+                "apiVersion": "0.2",
+                "model": {
+                    "identity": "test",
+                    "macAddresses": [
+                        "FF:FF:FF:FF:FF:FF"
+                    ]
+                }
+            }
+        ],
+        "userAttributes": {
+            "authMode": "scrypt",
+            "credentials": "secretsecret"
+        }
+    }
+}
