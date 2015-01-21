@@ -122,6 +122,19 @@ public class CreateAccount
 
   // Private Instance Methods ---------------------------------------------------------------------
 
+
+  private RelationalAccount createPersistentAccount()
+  {
+    RelationalAccount acct = new RelationalAccount();
+
+    getEntityManager().persist(acct);
+
+    return acct;
+  }
+
+
+  // TODO : resolve schema in a central location once at startup...
+
   private Schema resolveDBSchema()
   {
     String dbSchemaParameter = webapp.getInitParameter(WEBAPP_PARAM_SERVICE_DB_SCHEMA);
@@ -148,7 +161,7 @@ public class CreateAccount
     }
   }
 
-  private User createUserAccount(UserRegistration registration)
+  private RelationalUser createUserAccount(RelationalAccount acct, UserRegistration registration)
       throws DeserializationException
   {
     if (registration == null)
@@ -162,7 +175,7 @@ public class CreateAccount
 
     try
     {
-      return  createPersistentUserAccount(resolveDBSchema(), registration);
+      return  createPersistentUserAccount(resolveDBSchema(), acct, registration);
     }
 
     catch (Model.ValidationException exception)
@@ -180,16 +193,42 @@ public class CreateAccount
   }
 
 
-  private User createPersistentUserAccount(Schema schema, UserRegistration registration)
+  private void addController(Schema schema, RelationalAccount acct, Controller controller)
+  {
+    EntityManager em = getEntityManager();
+
+    switch (schema)
+    {
+      case LEGACY_BEEHIVE:
+
+        BeehiveController beehiveCtrl = new BeehiveController(acct, controller);
+
+        em.persist(beehiveCtrl);
+
+        break;
+
+      case ACCOUNT_MANAGER_2_0:
+
+        RelationalController relController = new RelationalController(acct, controller);
+
+        em.persist(relController);
+
+        break;
+
+      default:
+
+        throw new IncorrectImplementationException("Incorrect schema identifier: {0}", schema);
+    }
+  }
+
+  private RelationalUser createPersistentUserAccount(Schema schema, RelationalAccount acct,
+                                                     UserRegistration registration)
       throws Model.ValidationException
   {
     EntityManager em = getEntityManager();
 
-    RelationalAccount acct = new RelationalAccount();
-
     switch (schema)
     {
-
       case LEGACY_BEEHIVE:
 
         BeehiveUser beehiveUser = new BeehiveUser(
@@ -231,6 +270,23 @@ public class CreateAccount
     ACCOUNT_MANAGER_2_0
   }
 
+
+  // Nested Classes -------------------------------------------------------------------------------
+
+  private static class ControllerData extends CustomerFulfillment
+  {
+    private Controller controller = null;
+
+    ControllerData(CustomerFulfillment copy)
+    {
+      super(copy);
+
+      if (!super.controllers.isEmpty())
+      {
+        controller = controllers.iterator().next();
+      }
+    }
+  }
 
 }
 
