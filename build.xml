@@ -258,7 +258,7 @@
       </fileset>
 
       <fileset dir = "${lib.dir}/object-model-0.2.0">
-        <include name = "**/object-model-0.2.0.jar"/>
+        <include name = "**/object-model-0.2.0_WIP.jar"/>
         <exclude name = "LICENSE*"/>
       </fileset>
 
