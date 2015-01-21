@@ -35,16 +35,19 @@ import org.openremote.base.exception.IncorrectImplementationException;
 
 import org.openremote.logging.Logger;
 
+import org.openremote.model.Controller;
 import org.openremote.model.Model;
 import org.openremote.model.User;
 import org.openremote.model.data.json.DeserializationException;
 import org.openremote.model.persistence.jpa.RelationalAccount;
+import org.openremote.model.persistence.jpa.RelationalController;
 import org.openremote.model.persistence.jpa.RelationalUser;
+import org.openremote.model.persistence.jpa.beehive.BeehiveController;
 import org.openremote.model.persistence.jpa.beehive.BeehiveUser;
 
 import org.openremote.beehive.account.model.UserRegistration;
+import org.openremote.beehive.account.model.CustomerFulfillment;
 import org.openremote.beehive.account.model.rest.UserRegistrationReader;
-
 
 
 
@@ -67,7 +70,7 @@ public class CreateAccount
 
   // Class Members --------------------------------------------------------------------------------
 
-  private static Logger log = Logger.getInstance(AccountManager.Log.CREATE_USER);
+  private static Logger log = Logger.getInstance(AccountManager.Log.REGISTRATION);
 
 
   // Instance Fields ------------------------------------------------------------------------------
