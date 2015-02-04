@@ -82,11 +82,11 @@ printHelp()
   exit 0;
 }
 
-if [ "$1" == "help" -o "$1" == "-h" -o "$1" == "--help" ]; then
+if [ "$1" = "help" -o "$1" = "-h" -o "$1" = "--help" ]; then
   printHelp;
 fi
 
-if [ "$1" == "update" -o "$1" == "update-complete" ]; then
+if [ "$1" = "update" -o "$1" = "update-complete" ]; then
   ant -f build/project/auto-updated/do-not-modify/project-update.xml $@
 else
   ant -f build.xml $@;

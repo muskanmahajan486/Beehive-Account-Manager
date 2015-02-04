@@ -57,7 +57,7 @@ printHelp()
   exit 0;
 }
 
-if [ "$1" == "help" -o "$1" == "-h" -o "$1" == "--help" -o "$1" == "" ]; then
+if [ "$1" = "help" -o "$1" = "-h" -o "$1" = "--help" -o "$1" = "" ]; then
   printHelp;
 fi
 
