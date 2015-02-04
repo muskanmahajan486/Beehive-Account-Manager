@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
-Created-By: OpenRemote, Inc.
-Name: openremote-beehive-account-client
-Specification-Title: OpenRemote Beehive Account Client
+Created-By: Copyright 2013-2015, Juha Lindfors. All rights reserved.
+Name: beehive-account-client
+Specification-Title: Beehive Account Client
 Specification-Version: ${api.version}
-Specification-Vendor: OpenRemote, Inc.
-Implementation-Title: OpenRemote Beehive Account Client REST API
+Specification-Vendor: Copyright 2013-2015, Juha Lindfors. All rights reserved.
+Implementation-Title: Beehive Account Client REST API
 Implementation-Version: ${release.version}
-Implementation-Vendor: OpenRemote, Inc.
+Implementation-Vendor: Copyright 2013-2015, Juha Lindfors. All rights reserved.
 Main-Class: org.openremote.beehive.account.client.AccountManagerClient
