@@ -298,6 +298,11 @@
         <exclude name = "LICENSE*"/>
       </fileset>
 
+      <fileset dir = "${lib.dir}/flexjson-3.2">
+        <include name = "**/*.jar"/>
+        <exclude name = "LICENSE*"/>
+      </fileset>
+
     </copy>
 
 
