@@ -1,10 +1,6 @@
 #!/bin/sh
 #  --------------------------------------------------------------------
-#  OpenRemote, the Home of the Digital Home.
-#  Copyright 2008-2014, OpenRemote Inc.
-#
-#  See the contributors.txt file in the distribution for a full listing
-#  of individual contributors.
+#  Copyright 2013-2015, Juha Lindfors. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU Affero General Public License as
@@ -37,10 +33,9 @@ printHelp()
   echo "";
   echo "-------------------------------------------------------------";
   echo "";
-  echo "  OpenRemote, the Home of the Digital Home.";
-  echo "  Copyright 2008-2014, OpenRemote Inc.";
+  echo "  Copyright 2013-2015, Juha Lindfors. All rights reserved.";
   echo "";
-  echo "  Executes OpenRemote project build targets.";
+  echo "  Executes project build targets.";
   echo "";
   echo "-------------------------------------------------------------";
   echo "";

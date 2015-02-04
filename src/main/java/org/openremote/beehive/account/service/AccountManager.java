@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015, Juha Lindfors.
+ * Copyright 2013-2015, Juha Lindfors. All rights reserved.
  *
  * See the contributors.txt file in the distribution for a
  * full listing of individual contributors.
