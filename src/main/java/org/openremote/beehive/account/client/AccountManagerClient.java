@@ -19,18 +19,25 @@ package org.openremote.beehive.account.client;
 import java.io.File;
 import java.io.FileInputStream;
 
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URL;
 
 import java.nio.charset.Charset;
 
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.security.cert.Certificate;
 
 import javax.net.ssl.HostnameVerifier;
+//import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 
+import javax.net.ssl.TrustManagerFactory;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -39,11 +46,14 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
 
 import org.openremote.base.Version;
 import org.openremote.base.exception.InitializationException;
 
+import org.openremote.base.exception.OpenRemoteException;
+import org.openremote.base.exception.OpenRemoteRuntimeException;
 import org.openremote.security.KeyManager;
 import org.openremote.security.PrivateKeyManager;
 import org.openremote.security.SecurityProvider;
@@ -65,6 +75,9 @@ public class AccountManagerClient
 {
 
   // Constants ------------------------------------------------------------------------------------
+
+
+  public static final String HTTPS_PROTOCOL = "TLSv1.1";
 
   public static final URI REST_ROOT_PATH = URI.create("rest");
 
@@ -297,7 +310,7 @@ public class AccountManagerClient
 
   private String username;
 
-  private URI trustStoreLocation;
+  private URI trustStoreLocation = null;
 
 
 
@@ -333,7 +346,7 @@ public class AccountManagerClient
     return sendPost(target, jsonEntity);
   }
 
-  public Response create(UserRegistration user) throws Exception
+  public Response create(UserRegistration user)
   {
     WebTarget target = constructTargetBase(createClient()).path("users");
 
@@ -505,7 +518,6 @@ public class AccountManagerClient
 
   private Client createClient()
   {
-    //System.setProperty("javax.net.debug", "all");
     //System.setProperty("javax.net.ssl.trustStore", "/Users/juha/testTrustStore");
 
     ClientBuilder builder = ClientBuilder.newBuilder().hostnameVerifier(new HostnameVerifier()
@@ -518,22 +530,66 @@ public class AccountManagerClient
       }
     });
 
+
+    // set up a null trust manager factory -- if a trust store is not configured in this client
+    // the null reference will return default trust factories for SSL context...
+
+    TrustManagerFactory tmf = null;
+
+    if (trustStoreLocation != null)
+    {
+      // If a trust store has been configured for this client, attempt to load the keystore and
+      // initialize it for the SSL context...
+
+      try
+      {
+        KeyStore trustedKeyCertificates = KeyStore.getInstance(DEFAULT_TRUST_STORE_FORMAT.getStorageName());
+        FileInputStream fis = new FileInputStream(new File(trustStoreLocation));
+
+        trustedKeyCertificates.load(fis, KeyManager.EMPTY_KEY_PASSWORD);
+
+        tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(trustedKeyCertificates);
+      }
+
+      catch (FileNotFoundException exception)
+      {
+        throw new ClientConfigurationException(
+            "Configured trusted certificate store was not found at ''{0}'': {1}",
+            exception, trustStoreLocation, exception.getMessage()
+        );
+      }
+
+      catch (Exception exception)
+      {
+        throw new ClientConfigurationException(
+            "Error establishing a trust store: {0}", exception.getMessage()
+        );
+      }
+    }
+
     try
     {
-      KeyStore keystore = KeyStore.getInstance(DEFAULT_TRUST_STORE_FORMAT.getStorageName());
-      FileInputStream fis = new FileInputStream(new File(trustStoreLocation));
+      SSLContext ssl = SSLContext.getInstance(HTTPS_PROTOCOL);
+      ssl.init(null, (tmf == null) ? null : tmf.getTrustManagers(), null /* default secure random */);
 
-      keystore.load(fis, KeyManager.EMPTY_KEY_PASSWORD);
-
-      builder = builder.trustStore(keystore);
-
+      builder.sslContext(ssl);
     }
 
-    catch (Throwable t)
+    catch (NoSuchAlgorithmException exception)
     {
-      t.printStackTrace();
+      throw new ClientConfigurationException(
+          "HTTPS protocol {0} is not available in the current runtime : {1}",
+          exception, HTTPS_PROTOCOL, exception.getMessage()
+      );
     }
 
+    catch (KeyManagementException exception)
+    {
+      throw new ClientConfigurationException(
+          "Failed to initialize HTTPS SSL/TLS context : {0}", exception, exception.getMessage()
+      );
+    }
 
     return builder.build();
   }
@@ -554,5 +610,7 @@ public class AccountManagerClient
       return super.majorVersion + "/" + super.minorVersion + "/" + super.bugfixVersion;
     }
   }
+
+
 }
 

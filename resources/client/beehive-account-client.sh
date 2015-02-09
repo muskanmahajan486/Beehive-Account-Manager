@@ -96,8 +96,61 @@ CLASSPATH="$CLASSPATH:lib/hk2-utils-2.2.0.jar"
 # Javassist bytecode lib dependency.
 CLASSPATH="$CLASSPATH:lib/javassist-3.18.1-GA.jar"
 
+# Add main class as JVM argument
+JVM_ARGS="org.openremote.beehive.account.client.AccountManagerClient"
 
-java \
-  -classpath "$CLASSPATH" \
-  org.openremote.beehive.account.client.AccountManagerClient $@
+
+# -----------------------------------------------------------------------------
+#
+#  Debug options:
+#
+#   To debug SSL handshake from the client, add the Java system property
+#   '-Djavax.net.debug=ssl:handshake' to the JVM execution below. See
+#   JVM documentation for additional SSL/TLS debug options.
+#
+# -----------------------------------------------------------------------------
+
+# Uncomment the line below to enable SSL handshake debugging. See JVM
+# documentation for additional SSL/TLS debug options
+
+##DEBUG_SSL_CLIENT="-Djavax.net.debug=ssl:handshake
+
+if [ -n "$DEBUG_SSL_CLIENT" ]; then
+  JVM_ARGS="$DEBUG_SSL_CLIENT $JVM_ARGS"
+fi
+
+
+# -----------------------------------------------------------------------------
+#
+#  HTTPS Transport Layer Security:
+#
+#   The implementation strictly enforces TLS v1.1 and thus disables SSL
+#   protocols due to POODLE (CVE-2014-3566) SSLv3 vulnerability. To override
+#   the HTTPS security protocols being used, uncomment the line below.
+#
+#   Note that the availability of TLS protocol versions depends on the JVM
+#   version and vendor:
+#
+#                        TLSv1      TLSv1.1     TLSv1.2
+#
+#   Oracle JDK 6           x
+#   OpenJDK 6              x           x
+#   Oracle JDK 7           x           x           x
+#   OpenJDK 7              x           x           x
+#
+# -----------------------------------------------------------------------------
+
+# Uncomment the line below to override the HTTPS security protocol used
+# in the implementation.
+
+##HTTPS_PROTOCOLS="-Dhttps.protocols=TLSv1.1,TLSv1.2"
+
+if [ -n "$HTTPS_PROTOCOLS" ]; then
+  JVM_ARGS="$HTTPS_PROTOCOLS $JVM_ARGS"
+fi
+
+
+# Run...
+
+java -classpath "$CLASSPATH" $JVM_ARGS $@
 
