@@ -312,6 +312,9 @@ public class AccountManagerClient
 
   private URI trustStoreLocation = null;
 
+  private String httpsProtocolJcaName = null;
+
+
   //private WebTarget serviceEndpoint;
 
 
@@ -428,6 +431,19 @@ public class AccountManagerClient
     return createCertificateTrustStore(temp.toURI(), cert);
   }
 
+
+
+  public AccountManagerClient setHttpsProtocol(String jcaProtocolName)
+  {
+    this.httpsProtocolJcaName = jcaProtocolName;
+
+    return this;
+  }
+
+  public AccountManagerClient setHttpsProtocol(HttpsProtocol protocol)
+  {
+    return setHttpsProtocol(protocol.getJCAName());
+  }
 
 
 
@@ -590,6 +606,23 @@ public class AccountManagerClient
 
   private SSLContext selectHttpsProtocol()
   {
+    if (httpsProtocolJcaName != null)
+    {
+      try
+      {
+        return SSLContext.getInstance(httpsProtocolJcaName);
+      }
+
+      catch (NoSuchAlgorithmException exception)
+      {
+        throw new ClientConfigurationException(
+            "Configured HTTPS algorithm ''{0}'' is not available: {1}",
+            httpsProtocolJcaName, exception.getMessage()
+        );
+      }
+    }
+
+
     try
     {
       return SSLContext.getInstance(HttpsProtocol.TLS_V1_2.getJCAName());
