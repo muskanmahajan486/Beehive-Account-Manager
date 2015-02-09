@@ -27,7 +27,6 @@ import java.nio.charset.Charset;
 
 import java.security.KeyManagementException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.security.cert.Certificate;
@@ -46,14 +45,14 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import com.cloudseance.foundation.JavaVM;
 import org.bouncycastle.util.encoders.Base64;
 
 import org.openremote.base.Version;
 import org.openremote.base.exception.InitializationException;
 
-import org.openremote.base.exception.OpenRemoteException;
-import org.openremote.base.exception.OpenRemoteRuntimeException;
+import org.openremote.logging.Hierarchy;
+import org.openremote.logging.Logger;
 import org.openremote.security.KeyManager;
 import org.openremote.security.PrivateKeyManager;
 import org.openremote.security.SecurityProvider;
@@ -77,8 +76,6 @@ public class AccountManagerClient
   // Constants ------------------------------------------------------------------------------------
 
 
-  public static final String HTTPS_PROTOCOL = "TLSv1.1";
-
   public static final URI REST_ROOT_PATH = URI.create("rest");
 
   public static final URI RPC_REST_PATH = URI.create("rpc");
@@ -95,6 +92,9 @@ public class AccountManagerClient
 
 
   // Class Members --------------------------------------------------------------------------------
+
+
+  private static final Logger log = Logger.getInstance(Log.CLIENT);
 
 
   public static void main(String... args) throws Exception
@@ -312,6 +312,7 @@ public class AccountManagerClient
 
   private URI trustStoreLocation = null;
 
+  //private WebTarget serviceEndpoint;
 
 
   // Constructors ---------------------------------------------------------------------------------
@@ -570,18 +571,11 @@ public class AccountManagerClient
 
     try
     {
-      SSLContext ssl = SSLContext.getInstance(HTTPS_PROTOCOL);
+      SSLContext ssl = selectHttpsProtocol();
+
       ssl.init(null, (tmf == null) ? null : tmf.getTrustManagers(), null /* default secure random */);
 
       builder.sslContext(ssl);
-    }
-
-    catch (NoSuchAlgorithmException exception)
-    {
-      throw new ClientConfigurationException(
-          "HTTPS protocol {0} is not available in the current runtime : {1}",
-          exception, HTTPS_PROTOCOL, exception.getMessage()
-      );
     }
 
     catch (KeyManagementException exception)
@@ -592,6 +586,91 @@ public class AccountManagerClient
     }
 
     return builder.build();
+  }
+
+  private SSLContext selectHttpsProtocol()
+  {
+    try
+    {
+      return SSLContext.getInstance(HttpsProtocol.TLS_V1_2.getJCAName());
+    }
+
+    catch (NoSuchAlgorithmException exception)
+    {
+      log.debug("TLS 1.2 not available, trying TLS v1.1...");
+
+      try
+      {
+        return SSLContext.getInstance(HttpsProtocol.TLS_V1_1.getJCAName());
+      }
+
+      catch (NoSuchAlgorithmException exception2)
+      {
+        log.debug("TLS 1.1 not available, trying TLS v1.0...");
+
+        try
+        {
+          // For some reason at least Oracle JDK 6 seems to require this property to be set
+          // before TLS v1.0 is working purely without SSLv2Hello in handshake, not sure why.
+          // OpenJDK 6 includes TLS v1.1 so avoids this execution branch...
+
+          System.setProperty("https.protocols", "TLSv1");
+
+          return SSLContext.getInstance(HttpsProtocol.TLS_V1_0.getJCAName());
+        }
+
+        catch (NoSuchAlgorithmException exception3)
+        {
+          throw new ClientConfigurationException(
+              "HTTPS TLS protocols not available in the current runtime " +
+              "(tried TLS 1.0, TLS 1.1, TLS 1.2)"
+          );
+        }
+      }
+    }
+  }
+
+
+  // Nested Enums ---------------------------------------------------------------------------------
+
+  private enum HttpsProtocol
+  {
+    TLS_V1_0("TLSv1"),
+    TLS_V1_1("TLSv1.1"),
+    TLS_V1_2("TLSv1.2");
+
+
+    private String jcaName;
+
+    private HttpsProtocol(String jcaStandardName)
+    {
+      this.jcaName = jcaStandardName;
+    }
+
+    private String getJCAName()
+    {
+      return jcaName;
+    }
+  }
+
+
+  public enum Log implements Hierarchy
+  {
+
+    CLIENT("Client");
+
+
+    private String name;
+
+    private Log(String name)
+    {
+      this.name = name;
+    }
+
+    @Override public String getCanonicalLogHierarchyName()
+    {
+      return "OpenRemote.AccountManager." + name;
+    }
   }
 
 
