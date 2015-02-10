@@ -22,13 +22,11 @@ import java.lang.reflect.Type;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.MessageFormat;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
 
 import org.openremote.base.Defaults;
@@ -41,6 +39,8 @@ import org.openremote.model.data.json.UserTransformer;
 
 import org.openremote.beehive.account.model.UserRegistration;
 import org.openremote.beehive.account.service.AccountManager;
+import org.openremote.beehive.account.service.HttpBadRequest;
+import org.openremote.beehive.account.service.HttpInternalError;
 
 
 /**
@@ -127,7 +127,7 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
           exception, exception.getMessage()
       );
 
-      throw new BadRequest(
+      throw new HttpBadRequest(
           exception, "Unable to parse user registration from JSON: " + exception.getMessage()
       );
     }
@@ -136,7 +136,7 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
     {
       log.error("Unknown error: " + e.getMessage());
 
-      throw new InternalError(e, e.getMessage());
+      throw new HttpInternalError(e, e.getMessage());
     }
   }
 
@@ -149,7 +149,7 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
 
     if (credentials == null || credentials.equals(""))
     {
-      throw new BadRequest("User registration credentials are missing.");
+      throw new HttpBadRequest("User registration credentials are missing.");
     }
 
     return credentials.getBytes(Defaults.DEFAULT_CHARSET);
@@ -181,101 +181,6 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
 
     return result;
   }
-
-
-  // Nested Classes -------------------------------------------------------------------------------
-
-  public static class BadRequest extends WebApplicationException
-  {
-    public BadRequest(String message)
-    {
-      this(null, message);
-    }
-
-    public BadRequest(Throwable rootCause, final String message)
-    {
-      super(Response.noContent().status(
-
-          // TODO : add debug mode that includes the stack trace as a response document
-
-          new Response.StatusType()
-          {
-            @Override public int getStatusCode()
-            {
-              return Response.Status.BAD_REQUEST.getStatusCode();
-            }
-
-            @Override public String getReasonPhrase()
-            {
-              return "Bad Request - " + message;
-            }
-
-            @Override public Response.Status.Family getFamily()
-            {
-              return Response.Status.Family.CLIENT_ERROR;
-            }
-          }
-
-      ).build());
-    }
-  }
-
-
-  public static class InternalError extends WebApplicationException
-  {
-
-    public static String format(String msg, Object... params)
-    {
-      try
-      {
-        return MessageFormat.format(msg, params);
-      }
-
-      catch (Throwable cause)
-      {
-        return msg + "  [EXCEPTION MESSAGE FORMATTING ERROR: " + cause.getMessage().toUpperCase() + "]";
-      }
-    }
-
-    public InternalError(String message)
-    {
-      this(null, message);
-    }
-
-    public InternalError(String message, Object... params)
-    {
-      this(format(message, params));
-    }
-
-    public InternalError(Throwable rootCause, final String message)
-    {
-      super(Response.noContent().status(
-
-          // TODO : add debug mode that includes the stack trace as a response document
-
-          new Response.StatusType()
-          {
-            @Override public int getStatusCode()
-            {
-              return Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
-            }
-
-            @Override public String getReasonPhrase()
-            {
-              return "Internal Server Error - " + message;
-            }
-
-            @Override public Response.Status.Family getFamily()
-            {
-              return Response.Status.Family.SERVER_ERROR;
-            }
-          }
-
-      ).build());
-    }
-
-  }
-
 
 }
 

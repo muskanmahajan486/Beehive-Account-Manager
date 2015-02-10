@@ -34,6 +34,8 @@ import org.openremote.model.data.json.DeserializationException;
 
 import org.openremote.beehive.account.model.CustomerFulfillment;
 import org.openremote.beehive.account.service.AccountManager;
+import org.openremote.beehive.account.service.HttpBadRequest;
+import org.openremote.beehive.account.service.HttpInternalError;
 
 
 /**
@@ -97,7 +99,7 @@ public class CustomerFulfillmentReader implements MessageBodyReader<CustomerFulf
           exception, exception.getMessage()
       );
 
-      throw new UserRegistrationReader.BadRequest(
+      throw new HttpBadRequest(
           exception, "Unable to parse customer fulfillment from JSON: " + exception.getMessage()
       );
     }
@@ -110,14 +112,14 @@ public class CustomerFulfillmentReader implements MessageBodyReader<CustomerFulf
 
       log.error(msg, CustomerFulfillment.class.getSimpleName());
 
-      throw new UserRegistrationReader.InternalError(msg, CustomerFulfillment.class.getSimpleName());
+      throw new HttpInternalError(msg, CustomerFulfillment.class.getSimpleName());
     }
 
     catch (Exception exception)
     {
       log.error("Unknown error: " + exception.getMessage());
 
-      throw new UserRegistrationReader.InternalError(exception, exception.getMessage());
+      throw new HttpInternalError(exception, exception.getMessage());
     }
   }
 }
