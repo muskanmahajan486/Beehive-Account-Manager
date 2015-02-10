@@ -32,11 +32,10 @@ import java.security.Security;
 import java.security.cert.Certificate;
 
 import javax.net.ssl.HostnameVerifier;
-//import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
-
 import javax.net.ssl.TrustManagerFactory;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -45,7 +44,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.cloudseance.foundation.JavaVM;
 import org.bouncycastle.util.encoders.Base64;
 
 import org.openremote.base.Version;
@@ -180,7 +178,7 @@ public class AccountManagerClient
     System.out.println();
 
     Response response = client.create(
-        new UserRegistration(user, null, "Smb9324$#@#@$".getBytes(UTF8))
+        new UserRegistration(user, "email@host.domain", "Smb9324$#@#@$".getBytes(UTF8))
     );
 
     System.out.println(response.getStatus() + ": " + response.getStatusInfo());
