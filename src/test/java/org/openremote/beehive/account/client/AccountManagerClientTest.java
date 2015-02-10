@@ -90,7 +90,6 @@ public class AccountManagerClientTest
 
       throw new Error(msg);
     }
-
   }
 
 
@@ -158,7 +157,7 @@ public class AccountManagerClientTest
   }
 
 
-  // Tests ----------------------------------------------------------------------------------------
+  // Admin User Registration Tests ----------------------------------------------------------------
 
   @Test public void testAdminCreateUserRegistration() throws Exception
   {
@@ -194,6 +193,84 @@ public class AccountManagerClientTest
   }
 
 
+
+  @Test public void testAdminCreateMultipleUsers() throws Exception
+  {
+    testAdminCreateUserRegistration();
+    testAdminCreateUserRegistration();
+    testAdminCreateUserRegistration();
+    testAdminCreateUserRegistration();
+    testAdminCreateUserRegistration();
+  }
+
+  @Test public void testAdminCreateDuplicateUser() throws Exception
+  {
+    UserRegistration registration = new UserRegistration(
+        "testAdminCreateDuplicateUser",
+        "email@some.com",
+        new byte[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' }
+    );
+
+    Response response = defaultAdminClient.create(registration);
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
+    );
+
+    response = defaultAdminClient.create(registration);
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+        "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
+    );
+  }
+
+
+
+  @Test public void testCreateUserWrongAuthenticationCredentials() throws Exception
+  {
+    AccountManagerClient client = new AccountManagerClient(
+        DEFAULT_SERVICE_ROOT, ADMIN_USERNAME, "INCORRECT_ADMIN_PASSWORD".getBytes(Defaults.UTF8)
+    );
+
+    client.createTemporaryCertificateTrustStore(tomcat.getHttpsCertificate());
+
+    Response response = client.create(
+        new UserRegistration("newuser3", null, "newcredentials3".getBytes(Defaults.UTF8))
+    );
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode(),
+        "Got " + response.getStatus()
+    );
+  }
+
+  @Test public void testCreateUserNullEmail() throws Exception
+  {
+    defaultAdminClient.create(new User(UUID.randomUUID().toString(), null));
+  }
+
+
+
+  // User Create Registration Tests ---------------------------------------------------------------
+
+  @Test public void testCreateUser() throws Exception
+  {
+    Response response = defaultUserClient.create(
+        new UserRegistration("newuser2", null, "newcredentials2".getBytes(Defaults.UTF8))
+    );
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.FORBIDDEN.getStatusCode(),
+        "Got " + response.getStatus()
+    );
+  }
+
+
+
+
+
   @Test public void testAdminCreateCustomerFulfillment() throws Exception
   {
     Controller ctrl = new Controller();
@@ -215,15 +292,6 @@ public class AccountManagerClientTest
     );
   }
 
-  @Test public void testAdminCreateMultipleUsers() throws Exception
-  {
-    testAdminCreateUserRegistration();
-    testAdminCreateUserRegistration();
-    testAdminCreateUserRegistration();
-    testAdminCreateUserRegistration();
-    testAdminCreateUserRegistration();
-  }
-
   @Test public void testAdminCreateUserFulfillment() throws Exception
   {
     Controller controller = new Controller();
@@ -239,40 +307,6 @@ public class AccountManagerClientTest
     Assert.assertTrue(
         response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
         "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
-    );
-  }
-
-
-
-
-  @Test public void testCreateUser() throws Exception
-  {
-    Response response = defaultUserClient.create(
-        new UserRegistration("newuser2", null, "newcredentials2".getBytes(Defaults.UTF8))
-    );
-
-    Assert.assertTrue(
-        response.getStatus() == Response.Status.FORBIDDEN.getStatusCode(),
-        "Got " + response.getStatus()
-    );
-  }
-
-
-  @Test public void testCreateUserWrongAuthenticationCredentials() throws Exception
-  {
-    AccountManagerClient client = new AccountManagerClient(
-        DEFAULT_SERVICE_ROOT, ADMIN_USERNAME, "INCORRECT_ADMIN_PASSWORD".getBytes(Defaults.UTF8)
-    );
-
-    client.createTemporaryCertificateTrustStore(tomcat.getHttpsCertificate());
-
-    Response response = client.create(
-        new UserRegistration("newuser3", null, "newcredentials3".getBytes(Defaults.UTF8))
-    );
-
-    Assert.assertTrue(
-        response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode(),
-        "Got " + response.getStatus()
     );
   }
 
@@ -315,6 +349,19 @@ public class AccountManagerClientTest
     );
   }
 
+
+
+  @Test public void testHttpsConfiguration() throws Exception
+  {
+    AccountManagerClient client = new AccountManagerClient(
+        DEFAULT_SERVICE_ROOT,
+        ADMIN_USERNAME,
+        ADMIN_CREDENTIALS
+    ).setHttpsProtocol("SSLv2");
+
+    client.create(new User(UUID.randomUUID().toString(), "test@email.com"));
+
+  }
 
 }
 
