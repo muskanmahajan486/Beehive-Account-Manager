@@ -187,7 +187,7 @@
     <copy todir = "${output.dir}/client/classes" overwrite = "true">
 
       <fileset dir = "${classes.dir}">
-        <include name = "org/openremote/beehive/account/client/**"/>
+        <include name = "org/openremote/beehive/account/client/**/*.*"/>
       </fileset>
 
       <fileset dir = "${classes.dir}">
