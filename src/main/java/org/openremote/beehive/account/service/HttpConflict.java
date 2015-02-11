@@ -16,9 +16,15 @@
  */
 package org.openremote.beehive.account.service;
 
+import java.security.Principal;
+import java.text.MessageFormat;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import java.text.MessageFormat;
+
+import org.openremote.logging.Hierarchy;
+import org.openremote.logging.Logger;
+
 
 /**
  * @author Juha Lindfors
@@ -27,7 +33,6 @@ public class HttpConflict extends WebApplicationException
 {
 
   // TODO : create common base class
-
 
 
   public static String format(String msg, Object... params)
@@ -47,6 +52,23 @@ public class HttpConflict extends WebApplicationException
   public HttpConflict(String message)
   {
     this(null, message);
+  }
+
+
+  public HttpConflict(Principal user, Hierarchy category, String message)
+  {
+    this(message);
+
+    Logger log = Logger.getInstance(category);
+
+    // TODO : add configurable level
+
+    log.info("[user=" + user.getName() + "] " + message);
+  }
+
+  public HttpConflict(Principal user, Hierarchy category, String message, Object... messageParams)
+  {
+    this(user, category, format(message, messageParams));
   }
 
   public HttpConflict(String message, Object... params)

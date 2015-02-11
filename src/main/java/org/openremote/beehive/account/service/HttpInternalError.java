@@ -16,9 +16,15 @@
  */
 package org.openremote.beehive.account.service;
 
+import java.security.Principal;
+import java.text.MessageFormat;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import java.text.MessageFormat;
+
+import org.openremote.logging.Hierarchy;
+import org.openremote.logging.Logger;
+
 
 /**
  * @author Juha Lindfors
@@ -47,9 +53,37 @@ public class HttpInternalError extends WebApplicationException
     this(null, message);
   }
 
+  public HttpInternalError(Principal user, Hierarchy category, Throwable rootCause, String message)
+  {
+    this(rootCause, message);
+
+    Logger log = Logger.getInstance(category);
+
+    // TODO : add configurable level
+
+    log.info("[user=" + user.getName() + "] " + message);
+  }
+
+
+  public HttpInternalError(Principal user, Hierarchy category, String message)
+  {
+    this(user, category, null, message);
+  }
+
+  public HttpInternalError(Principal user, Hierarchy category, String message, Object... messageParams)
+  {
+    this(user, category, format(message, messageParams));
+  }
+
   public HttpInternalError(String message, Object... params)
   {
     this(format(message, params));
+  }
+
+  public HttpInternalError(Principal user, Hierarchy category, Throwable rootCause,
+                           String message, Object... messageParams)
+  {
+    this(user, category, rootCause, format(message, messageParams));
   }
 
   public HttpInternalError(Throwable rootCause, final String message)
