@@ -113,7 +113,7 @@ public class CreateAccount
 
     ControllerData ctrlData = new ControllerData(fulfillment);
 
-    addController(resolveDBSchema(), acct, ctrlData.controller);
+    addController(Schema.resolveDBSchema(webapp), acct, ctrlData.controller);
 
     log.info(
         "CREATE ACCOUNT: [Service admin: ''{0}''] created new account for user ''{1}''.",
@@ -153,35 +153,6 @@ public class CreateAccount
   }
 
 
-  // TODO : resolve schema in a central location once at startup...
-
-  private Schema resolveDBSchema()
-  {
-    String dbSchemaParameter = webapp.getInitParameter(WEBAPP_PARAM_SERVICE_DB_SCHEMA);
-
-    if (dbSchemaParameter == null)
-    {
-       // TODO Log
-
-      return Schema.ACCOUNT_MANAGER_2_0;
-    }
-
-    dbSchemaParameter = dbSchemaParameter.toUpperCase(Locale.ENGLISH);
-
-    try
-    {
-      return Schema.valueOf(dbSchemaParameter);
-    }
-
-    catch (IllegalArgumentException e)
-    {
-      // TODO : adjust exception type? log on the server
-
-      throw new HttpInternalError(
-          "Invalid " + WEBAPP_PARAM_SERVICE_DB_SCHEMA + "value: " + dbSchemaParameter
-      );
-    }
-  }
 
   private RelationalUser createUserAccount(RelationalAccount acct, UserRegistration registration)
   {
@@ -196,10 +167,12 @@ public class CreateAccount
       );
     }
 
+    Schema schema = Schema.resolveDBSchema(webapp);
+
     // throw HTTP 409 - Conflict if given username already exists (covers the underlying
     // persistence constraint exception that would be thrown otherwise instead)...
 
-    if (exists(resolveDBSchema(), registration.getName()))
+    if (exists(schema, registration.getName()))
     {
       throw new HttpConflict(
           security.getUserPrincipal(), LOG_CATEGORY,
@@ -210,7 +183,7 @@ public class CreateAccount
 
     try
     {
-      return  createPersistentUserAccount(resolveDBSchema(), acct, registration);
+      return  createPersistentUserAccount(schema, acct, registration);
     }
 
     catch (Model.ValidationException exception)
@@ -350,10 +323,41 @@ public class CreateAccount
 
   // Enums ----------------------------------------------------------------------------------------
 
-  private enum Schema
+  public enum Schema
   {
     LEGACY_BEEHIVE,
-    ACCOUNT_MANAGER_2_0
+    ACCOUNT_MANAGER_2_0;
+
+    // TODO : resolve schema in a central location once at startup...
+
+    public static Schema resolveDBSchema(ServletContext webapp)
+    {
+      String dbSchemaParameter = webapp.getInitParameter(WEBAPP_PARAM_SERVICE_DB_SCHEMA);
+
+      if (dbSchemaParameter == null)
+      {
+        // TODO Log
+
+        return Schema.ACCOUNT_MANAGER_2_0;
+      }
+
+      dbSchemaParameter = dbSchemaParameter.toUpperCase(Locale.ENGLISH);
+
+      try
+      {
+        return Schema.valueOf(dbSchemaParameter);
+      }
+
+      catch (IllegalArgumentException e)
+      {
+        // TODO : adjust exception type + log on the server
+
+        throw new HttpInternalError(
+            "Invalid " + WEBAPP_PARAM_SERVICE_DB_SCHEMA + "value: " + dbSchemaParameter
+        );
+      }
+    }
+
   }
 
 

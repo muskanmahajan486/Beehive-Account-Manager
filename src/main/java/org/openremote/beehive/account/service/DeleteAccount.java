@@ -16,9 +16,13 @@
  */
 package org.openremote.beehive.account.service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -27,21 +31,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * TODO
  *
- * @author <a href="mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
 @Path ("/users/{username}")
 
 public class DeleteAccount
 {
-  @Context
-  private SecurityContext security;
+  @Context private SecurityContext security;
 
-  @Context
-  private HttpServletRequest request;
+  @Context private HttpServletRequest request;
+
+  @Context private ServletContext webapp;
 
   /**
    * Inject the username value from this resource path's URI template.
@@ -49,31 +55,47 @@ public class DeleteAccount
   @NotNull @PathParam ("username")
   private String username;
 
-
   @DELETE @Produces (MediaType.TEXT_PLAIN)
 
-  public String delete() throws Exception
+  public void delete() throws Exception
   {
-    BufferedReader reader= new BufferedReader(new InputStreamReader(request.getInputStream()));
-
-    System.err.println("DELETE ACCOUNT");
-
-    while(true)
+    try
     {
-      String str = reader.readLine();
+      CreateAccount.Schema schema = CreateAccount.Schema.resolveDBSchema(webapp);
 
-      if (str == null)
+      String entityName = "User";
+
+      if (schema == CreateAccount.Schema.LEGACY_BEEHIVE)
       {
-        break;
+        entityName = "BeehiveUser";
       }
 
-      System.err.print(str);
+      EntityManager entityManager = getEntityManager();
+
+      List results = entityManager
+          .createQuery("SELECT u FROM " + entityName + " u WHERE u.username = :name")
+          .setParameter("name", username)
+          .getResultList();
+
+      if (results.isEmpty())
+      {
+        // TODO : align with other exception types
+
+        throw new NotFoundException("Username was not found.");
+      }
+
+      entityManager.remove(results.get(0));
     }
 
-    System.err.println("");
+    catch (PersistenceException exception)
+    {
+      throw new HttpInternalError(exception.getMessage());
+    }
+  }
 
-    return "[SEC: " + security.getUserPrincipal().getName() + "] Delete account for user " +
-        username + "\n";
+  private EntityManager getEntityManager()
+  {
+    return (EntityManager)request.getAttribute(AccountManager.ENTITY_MANAGER_LOOKUP);
   }
 }
 

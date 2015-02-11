@@ -317,7 +317,25 @@ public class AccountManagerClientTest
     Response response = defaultAdminClient.delete("user");
 
     Assert.assertTrue(
-        response.getStatus() == Response.Status.OK.getStatusCode(),
+        response.getStatus() == Response.Status.NOT_FOUND.getStatusCode(),
+        "Got " + response.getStatus()
+    );
+
+    String uname = UUID.randomUUID().toString();
+
+    response = defaultAdminClient.create(
+        new UserRegistration(uname, "my@email.com", "newcredentials2".getBytes(Defaults.UTF8))
+    );
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        "Got " + response.getStatus()
+    );
+
+    defaultAdminClient.delete(uname);
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
         "Got " + response.getStatus()
     );
   }
