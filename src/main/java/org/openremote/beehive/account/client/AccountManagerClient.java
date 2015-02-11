@@ -560,7 +560,9 @@ public class AccountManagerClient
 
       try
       {
-        KeyStore trustedKeyCertificates = KeyStore.getInstance(DEFAULT_TRUST_STORE_FORMAT.getStorageName());
+        KeyStore trustedKeyCertificates =
+            KeyStore.getInstance(DEFAULT_TRUST_STORE_FORMAT.getStorageName());
+
         FileInputStream fis = new FileInputStream(new File(trustStoreLocation));
 
         trustedKeyCertificates.load(fis, KeyManager.EMPTY_KEY_PASSWORD);

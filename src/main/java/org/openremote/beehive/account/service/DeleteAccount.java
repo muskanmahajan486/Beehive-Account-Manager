@@ -16,11 +16,16 @@
  */
 package org.openremote.beehive.account.service;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+
 import javax.validation.constraints.NotNull;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
@@ -29,10 +34,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Locale;
+
 
 /**
  * TODO

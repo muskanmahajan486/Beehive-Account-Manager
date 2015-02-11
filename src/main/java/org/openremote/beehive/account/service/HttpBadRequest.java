@@ -18,7 +18,7 @@ package org.openremote.beehive.account.service;
 
 import java.security.Principal;
 import java.text.MessageFormat;
-import java.util.logging.Level;
+//import java.util.logging.Level;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

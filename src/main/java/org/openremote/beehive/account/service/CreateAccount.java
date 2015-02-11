@@ -16,14 +16,12 @@
  */
 package org.openremote.beehive.account.service;
 
-import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
+//import java.util.logging.Level;
 
 import javax.persistence.EntityManager;
 
 import javax.persistence.PersistenceException;
-import javax.persistence.Query;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 

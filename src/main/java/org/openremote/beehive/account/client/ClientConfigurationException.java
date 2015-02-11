@@ -16,7 +16,7 @@
  */
 package org.openremote.beehive.account.client;
 
-import org.openremote.base.exception.OpenRemoteException;
+//import org.openremote.base.exception.OpenRemoteException;
 import org.openremote.base.exception.OpenRemoteRuntimeException;
 
 /**
