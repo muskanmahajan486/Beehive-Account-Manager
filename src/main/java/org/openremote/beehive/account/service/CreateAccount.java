@@ -18,6 +18,7 @@ package org.openremote.beehive.account.service;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 
 import javax.persistence.EntityManager;
 
@@ -91,7 +92,7 @@ public class CreateAccount
 
   @Consumes({ MediaType.APPLICATION_JSON, UserRegistration.JSON_HTTP_CONTENT_TYPE })
 
-  @POST public void create(UserRegistration registration) throws DeserializationException
+  @POST public void create(UserRegistration registration)
   {
     RelationalAccount acct = createPersistentAccount();
     User user = createUserAccount(acct, registration);
@@ -130,11 +131,25 @@ public class CreateAccount
 
   private RelationalAccount createPersistentAccount()
   {
-    RelationalAccount acct = new RelationalAccount();
+    try
+    {
+      RelationalAccount acct = new RelationalAccount();
 
-    getEntityManager().persist(acct);
+      getEntityManager().persist(acct);
 
-    return acct;
+      return acct;
+    }
+
+    catch (PersistenceException exception)
+    {
+      // throw HTTP 500 - Internal Error in case the database save fails...
+
+      throw new HttpInternalError(
+          security.getUserPrincipal(), LOG_CATEGORY, exception,
+          "Account creation FAILED: {0}",
+          exception.getMessage()
+      );
+    }
   }
 
 
@@ -160,6 +175,8 @@ public class CreateAccount
 
     catch (IllegalArgumentException e)
     {
+      // TODO : adjust exception type? log on the server
+
       throw new HttpInternalError(
           "Invalid " + WEBAPP_PARAM_SERVICE_DB_SCHEMA + "value: " + dbSchemaParameter
       );
@@ -207,27 +224,11 @@ public class CreateAccount
           exception.getMessage()
       );
     }
-
-    catch (PersistenceException exception)
-    {
-      // throw HTTP 500 - Internal Error in case of any other persistence related exceptions...
-
-      throw new HttpInternalError(
-          security.getUserPrincipal(), LOG_CATEGORY, exception,
-          "Account creation failed: {0}",
-          exception.getMessage()
-      );
-    }
   }
 
 
-  private EntityManager getEntityManager()
-  {
-    return (EntityManager)request.getAttribute(AccountManager.ENTITY_MANAGER_LOOKUP);
-  }
 
-
-  private void addController(Schema schema, RelationalAccount acct, Controller controller)
+  private void addController(Schema schema, RelationalAccount acct, final Controller controller)
   {
     EntityManager em = getEntityManager();
 
@@ -289,40 +290,61 @@ public class CreateAccount
                                                      UserRegistration registration)
       throws Model.ValidationException
   {
-    EntityManager em = getEntityManager();
-
-    switch (schema)
+    try
     {
-      case LEGACY_BEEHIVE:
+      EntityManager em = getEntityManager();
 
-        BeehiveUser beehiveUser = new BeehiveUser(
-            acct, registration,
-            registration.getAttribute(User.CREDENTIALS_ATTRIBUTE_NAME).getBytes(Defaults.UTF8)
-        );
+      switch (schema)
+      {
+        case LEGACY_BEEHIVE:
 
-        beehiveUser.link(acct);
+          BeehiveUser beehiveUser = new BeehiveUser(
+              acct, registration,
+              registration.getAttribute(User.CREDENTIALS_ATTRIBUTE_NAME).getBytes(Defaults.UTF8)
+          );
 
-        em.persist(acct);
-        em.persist(beehiveUser);
+          beehiveUser.link(acct);
 
-        return beehiveUser;
+          // TODO : eliminate the code duplication on persist (and linking?)...
 
-      case ACCOUNT_MANAGER_2_0:
+          em.persist(acct);   // TODO : not needed?
+          em.persist(beehiveUser);
 
-        RelationalUser user = new RelationalUser(registration);
+          return beehiveUser;
 
-        user.link(acct);
+        case ACCOUNT_MANAGER_2_0:
 
-        em.persist(acct);
-        em.persist(user);
+          RelationalUser user = new RelationalUser(registration);
 
-        return user;
+          user.link(acct);
 
+          em.persist(acct);   // TODO : not needed?
+          em.persist(user);
 
-      default:
+          return user;
 
-        throw new IncorrectImplementationException("Incorrect schema identifier: {0}", schema);
+        default:
+
+          throw new IncorrectImplementationException("Incorrect schema identifier: {0}", schema);
+      }
     }
+
+    catch (PersistenceException exception)
+    {
+      // throw HTTP 500 - Internal Error in case the database save fails...
+
+      throw new HttpInternalError(
+          security.getUserPrincipal(), LOG_CATEGORY, exception,
+          "Account creation FAILED: {0}", exception.getMessage()
+      );
+    }
+  }
+
+
+
+  private EntityManager getEntityManager()
+  {
+    return (EntityManager)request.getAttribute(AccountManager.ENTITY_MANAGER_LOOKUP);
   }
 
 

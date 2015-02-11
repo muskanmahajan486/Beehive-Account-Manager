@@ -458,6 +458,8 @@ public class AccountManagerClient
 
   private Response sendPost(WebTarget target, Entity content)
   {
+    // TODO : catch javax.ws.rs.ProcessingException
+
     Invocation.Builder invocationBuilder = target.request();
 
     authenticate(invocationBuilder);
