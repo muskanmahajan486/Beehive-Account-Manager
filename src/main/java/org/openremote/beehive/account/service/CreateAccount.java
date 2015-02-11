@@ -168,9 +168,13 @@ public class CreateAccount
 
   private RelationalUser createUserAccount(RelationalAccount acct, UserRegistration registration)
   {
+    // throw HTTP 400 - Bad Request if the incoming user registration document didn't
+    // deserialize correctly...
+
     if (registration == null)
     {
-      throw new DeserializationException(
+      throw new HttpBadRequest(
+          security.getUserPrincipal(), LOG_CATEGORY,
           "User registration JSON representation was not correctly deserialized."
       );
     }
@@ -194,8 +198,24 @@ public class CreateAccount
 
     catch (Model.ValidationException exception)
     {
-      throw new DeserializationException(
-          "Incorrect user data: {0}", exception, exception.getMessage()
+      // throw HTTP 400 - Bad Request if the user data in the incoming document cannot be
+      // validated...
+
+      throw new HttpBadRequest(
+          security.getUserPrincipal(), LOG_CATEGORY, exception,
+          "Incorrect user data: {0}",
+          exception.getMessage()
+      );
+    }
+
+    catch (PersistenceException exception)
+    {
+      // throw HTTP 500 - Internal Error in case of any other persistence related exceptions...
+
+      throw new HttpInternalError(
+          security.getUserPrincipal(), LOG_CATEGORY, exception,
+          "Account creation failed: {0}",
+          exception.getMessage()
       );
     }
   }
