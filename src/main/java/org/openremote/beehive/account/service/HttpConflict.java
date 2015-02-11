@@ -23,10 +23,11 @@ import java.text.MessageFormat;
 /**
  * @author Juha Lindfors
  */
-public class HttpInternalError extends WebApplicationException
+public class HttpConflict extends WebApplicationException
 {
 
   // TODO : create common base class
+
 
 
   public static String format(String msg, Object... params)
@@ -42,17 +43,18 @@ public class HttpInternalError extends WebApplicationException
     }
   }
 
-  public HttpInternalError(String message)
+
+  public HttpConflict(String message)
   {
     this(null, message);
   }
 
-  public HttpInternalError(String message, Object... params)
+  public HttpConflict(String message, Object... params)
   {
     this(format(message, params));
   }
 
-  public HttpInternalError(Throwable rootCause, final String message)
+  public HttpConflict(Throwable rootCause, final String message)
   {
     super(Response.noContent().status(
 
@@ -62,17 +64,17 @@ public class HttpInternalError extends WebApplicationException
         {
           @Override public int getStatusCode()
           {
-            return Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
+            return 409;
           }
 
           @Override public String getReasonPhrase()
           {
-            return "Internal Server Error - " + message;
+            return "Conflict - " + message;
           }
 
           @Override public Response.Status.Family getFamily()
           {
-            return Response.Status.Family.SERVER_ERROR;
+            return Response.Status.Family.CLIENT_ERROR;
           }
         }
 

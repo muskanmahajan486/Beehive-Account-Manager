@@ -16,10 +16,13 @@
  */
 package org.openremote.beehive.account.service;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.persistence.EntityManager;
 
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -47,8 +50,6 @@ import org.openremote.model.persistence.jpa.beehive.BeehiveUser;
 
 import org.openremote.beehive.account.model.UserRegistration;
 import org.openremote.beehive.account.model.CustomerFulfillment;
-import org.openremote.beehive.account.model.rest.UserRegistrationReader;
-
 
 
 /**
@@ -67,10 +68,14 @@ public class CreateAccount
 
   public static final String WEBAPP_PARAM_SERVICE_DB_SCHEMA = "ServiceSchema";
 
+  private static final AccountManager.Log LOG_CATEGORY = AccountManager.Log.REGISTRATION;
+
+
 
   // Class Members --------------------------------------------------------------------------------
 
-  private static Logger log = Logger.getInstance(AccountManager.Log.REGISTRATION);
+  private static Logger log = Logger.getInstance(LOG_CATEGORY);
+
 
 
   // Instance Fields ------------------------------------------------------------------------------
@@ -155,14 +160,13 @@ public class CreateAccount
 
     catch (IllegalArgumentException e)
     {
-      throw new UserRegistrationReader.InternalError(
+      throw new HttpInternalError(
           "Invalid " + WEBAPP_PARAM_SERVICE_DB_SCHEMA + "value: " + dbSchemaParameter
       );
     }
   }
 
   private RelationalUser createUserAccount(RelationalAccount acct, UserRegistration registration)
-      throws DeserializationException
   {
     if (registration == null)
     {
@@ -171,7 +175,17 @@ public class CreateAccount
       );
     }
 
-    // TODO check/test for duplicate user names
+    // throw HTTP 409 - Conflict if given username already exists (covers the underlying
+    // persistence constraint exception that would be thrown otherwise instead)...
+
+    if (exists(resolveDBSchema(), registration.getName()))
+    {
+      throw new HttpConflict(
+          security.getUserPrincipal(), LOG_CATEGORY,
+          "User ''{0}'' already exists.",
+          registration.getName()
+      );
+    }
 
     try
     {
