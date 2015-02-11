@@ -255,6 +255,36 @@ public class CreateAccount
     }
   }
 
+
+  private boolean exists(Schema schema, String username)
+  {
+    try
+    {
+      String entityName = "User";
+
+      if (schema == Schema.LEGACY_BEEHIVE)
+      {
+        entityName = "BeehiveUser";
+      }
+
+      return getEntityManager().createQuery(
+          "SELECT u FROM " + entityName + " u WHERE u.username = :name", User.class)
+          .setParameter("name", username)
+          .getResultList().size() != 0;
+    }
+
+    catch (PersistenceException exception)
+    {
+      // throw HTTP 500 - Internal Error in case the database operation fails...
+
+      throw new HttpInternalError(
+          security.getUserPrincipal(), LOG_CATEGORY, exception,
+          "Error in checking duplicate usernames: {0}",
+          exception.getMessage()
+      );
+    }
+  }
+
   private RelationalUser createPersistentUserAccount(Schema schema, RelationalAccount acct,
                                                      UserRegistration registration)
       throws Model.ValidationException
