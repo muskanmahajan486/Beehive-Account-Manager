@@ -221,7 +221,7 @@ public class AccountManagerClientTest
     response = defaultAdminClient.create(registration);
 
     Assert.assertTrue(
-        response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+        response.getStatus() == Response.Status.CONFLICT.getStatusCode(),
         "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
     );
   }
