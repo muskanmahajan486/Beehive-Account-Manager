@@ -170,7 +170,7 @@ public class AccountManagerClientTest
     Response response = defaultAdminClient.create(registration);
 
     Assert.assertTrue(
-        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        response.getStatus() == Response.Status.OK.getStatusCode(),
         "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
     );
   }
@@ -187,7 +187,7 @@ public class AccountManagerClientTest
     Response response = defaultAdminClient.create(user);
 
     Assert.assertTrue(
-        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        response.getStatus() == Response.Status.OK.getStatusCode(),
         "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
     );
   }
@@ -214,7 +214,7 @@ public class AccountManagerClientTest
     Response response = defaultAdminClient.create(registration);
 
     Assert.assertTrue(
-        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        response.getStatus() == Response.Status.OK.getStatusCode(),
         "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
     );
 
@@ -287,7 +287,7 @@ public class AccountManagerClientTest
     Response response = defaultAdminClient.create(fulfillment);
 
     Assert.assertTrue(
-        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        response.getStatus() == Response.Status.OK.getStatusCode(),
         "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
     );
   }
@@ -305,7 +305,7 @@ public class AccountManagerClientTest
     Response response = defaultAdminClient.create(customer);
 
     Assert.assertTrue(
-        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        response.getStatus() == Response.Status.OK.getStatusCode(),
         "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
     );
   }
@@ -328,14 +328,14 @@ public class AccountManagerClientTest
     );
 
     Assert.assertTrue(
-        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        response.getStatus() == Response.Status.OK.getStatusCode(),
         "Got " + response.getStatus()
     );
 
     defaultAdminClient.delete(uname);
 
     Assert.assertTrue(
-        response.getStatus() == Response.Status.NO_CONTENT.getStatusCode(),
+        response.getStatus() == Response.Status.OK.getStatusCode(),
         "Got " + response.getStatus()
     );
   }

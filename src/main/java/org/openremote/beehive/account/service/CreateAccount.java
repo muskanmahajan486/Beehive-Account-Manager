@@ -30,6 +30,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.openremote.base.Defaults;
@@ -90,7 +91,7 @@ public class CreateAccount
 
   @Consumes({ MediaType.APPLICATION_JSON, UserRegistration.JSON_HTTP_CONTENT_TYPE })
 
-  @POST public void create(UserRegistration registration)
+  @POST public Response create(UserRegistration registration)
   {
     RelationalAccount acct = createPersistentAccount();
     User user = createUserAccount(acct, registration);
@@ -99,12 +100,14 @@ public class CreateAccount
         "CREATE ACCOUNT: [Service admin: ''{0}''] created new account for user ''{1}''.",
         security.getUserPrincipal().getName(), user.getName()
     );
+
+    return Response.ok().build();
   }
 
 
   @Consumes(CustomerFulfillment.JSON_HTTP_CONTENT_TYPE)
 
-  @POST public void create(CustomerFulfillment fulfillment) throws DeserializationException
+  @POST public Response create(CustomerFulfillment fulfillment) throws DeserializationException
   {
     RelationalAccount acct = createPersistentAccount();
     RelationalUser user = createUserAccount(acct, fulfillment);
@@ -117,6 +120,8 @@ public class CreateAccount
         "CREATE ACCOUNT: [Service admin: ''{0}''] created new account for user ''{1}''.",
         security.getUserPrincipal().getName(), user.getName()
     );
+
+    return Response.ok().build();
   }
 
 
