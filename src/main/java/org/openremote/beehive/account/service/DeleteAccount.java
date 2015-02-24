@@ -57,9 +57,12 @@ public class DeleteAccount
   @NotNull @PathParam ("username")
   private String username;
 
+
+  // REST API Implementation ----------------------------------------------------------------------
+
   @DELETE @Produces (MediaType.TEXT_PLAIN)
 
-  public void delete() throws Exception
+  public Response delete() throws Exception
   {
     try
     {
@@ -93,7 +96,13 @@ public class DeleteAccount
     {
       throw new HttpInternalError(exception.getMessage());
     }
+
+    return Response.ok().build();
   }
+
+
+
+  // Private Instance Methods ---------------------------------------------------------------------
 
   private EntityManager getEntityManager()
   {
