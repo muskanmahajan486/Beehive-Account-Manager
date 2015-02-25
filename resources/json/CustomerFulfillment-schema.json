@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "properties": {
+    "libraryName": {
+      "type": "string",
+      "pattern": "^OpenRemote Object Model$"
+    },
+    "javaFullClassName": {
+      "type": "string",
+      "pattern": "^org.openremote.beehive.account.model(.[a-zA-Z0-9_]+)+$"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}(_.*)?$"
+    },
+    "apiVersion": {
+      "type": "string",
+      "pattern": "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}(_.*)?$"
+    },
+    "model": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^.*$"
+        },
+        "email": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 255,
+          "optional": true,
+          "pattern": "^.*@.*\\..*$",
+          "default": ""
+        },
+        "controllers": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "optional": true,
+          "additionalProperties": false
+        },
+        "userAttributes": {
+          "type": "object",
+          "optional": true
+        }
+      }
+    }
+  }
+}

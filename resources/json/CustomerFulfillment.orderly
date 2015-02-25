@@ -1,0 +1,95 @@
+// ------------------------------------------------------------------------------------------------
+//  Copyright 2013-2015, Juha Lindfors. All rights reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as
+//  published by the Free Software Foundation; either version 3 of the
+//  License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program; if not, see <http://www.gnu.org/licenses/>.
+// ------------------------------------------------------------------------------------------------
+
+
+// ================================================================================================
+//
+//  CustomerFulfillment JSON 4.0.0 Schema
+//
+// ================================================================================================
+
+object {
+
+  // Headers to support versioning and version migration.
+  //
+  //  - A library name property with a fixed value "OpenRemote Object Model"
+  //  - A fully qualified Java class name in package 'org.openremote.beehive.account.model'
+  //  - A schema version number with 'major.minor.bugfix' and an optional
+  //    version identifier using '_' separator with 'bugfix' version.
+  //  - A current API implementation version with 'major.minor.bugfix' and an
+  //    optional version identifier using '_' separator with 'bugfix' version.
+
+  string libraryName       /^OpenRemote Object Model$/;
+  string javaFullClassName /^org.openremote.beehive.account.model(.[a-zA-Z0-9_]+)+$/;
+  string schemaVersion     /^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}(_.*)?$/;
+  string apiVersion        /^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}(_.*)?$/;
+
+
+  // The model object consists of mandatory username and an optional email attribute and
+  // an optional controller object.
+
+  object {
+
+
+    // The username has been defined as an arbitrary string with minimum length
+    // of one and maximum of 255 characters. The user model implementation can enforce additional
+    // username minimum length restrictions and content restrictions if necessary. The
+    // upper length limit is typically restricted by the database schema in use.
+
+    string{1,255} username          /^.*$/;
+
+
+    // The email attribute, if present, has been defined as an arbitrary string with minimum
+    // length of six characters and maximum length of 255 characters with format that expects
+    // emails to be in the form 'email@host.domain'. The user model implementation
+    // may enforce additional email format validation rules. The upper string length limit is
+    // typically restricted by the database schema in use. If user's email is not included but
+    // the email attribute is included within the JSON document, the email defaults to an empty
+    // string.
+
+    string{6,255} email             /^.*@.*\..*$/ = "" ?;
+
+
+    // An optional array of controller objects. See the orderly definition for controller in
+    // object model's Controller.orderly for the exact definition of the objects in the
+    // array.
+
+    array [ object { }* ] controllers ?;
+
+
+    // An optional user attribute key,value pairs can be included with this object. The maximum
+    // allowed key length for attributes is 255 characters and for attribute values is 999
+    // charactes. These limitations are typically enforced by the backing database schema and
+    // no further schema specifications for user attributes in JSON format is specified here.
+    // If user attributes in the domain object are represented by an empty collection, they
+    // should be omitted by the JSON format altogether.
+    //
+    // NOTES:
+    //   - Additional user attributes present in the current Beehive schema
+    //     are present and can be retrieved through userAttributes object
+    //
+    // Beehive legacy schema (version 1):
+    //   - a "registrationTime" attribute will be present in the userAttributes object for
+    //     User instances created from legacy Beehive schema. The value of the registrationTime
+    //     attribute is a String representation of Java 64-bit Long type containing the number
+    //     of milliseconds since January 1, 1970, 00:00:00 GMT
+
+    object { } * userAttributes ?;
+
+  } * model;
+
+} * ;
