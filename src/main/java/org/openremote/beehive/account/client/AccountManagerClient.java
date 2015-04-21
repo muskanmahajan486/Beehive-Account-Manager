@@ -64,7 +64,18 @@ import org.openremote.beehive.account.model.UserRegistration;
 
 
 /**
- * TODO
+ * This is a convenience client Java API for executing the REST RPC operations on Beehive account
+ * manager service. It helps in abstracting away the details of the HTTP layer; the JSON transfer
+ * documents are handled by the Java domain objects and the mapping of operations to HTTP URLs
+ * and use of correct media types are handled by this API. <p>
+ *
+ * For examples on how to directly invoke corresponding operations against the service's HTTP REST
+ * API with 'curl', refer to the examples in the documentation.
+ *
+ * @see #create(org.openremote.model.User)
+ * @see #create(org.openremote.beehive.account.model.UserRegistration)
+ * @see #create(org.openremote.beehive.account.model.CustomerFulfillment)
+ * @see #delete(String)
  *
  * @author Juha Lindfors
  */
@@ -391,8 +402,6 @@ public class AccountManagerClient
 
   public Response create(UserRegistration user)
   {
-
-    
     WebTarget target = constructTargetBase(createClient()).path("users");
 
     Entity<String> jsonEntity = Entity.entity(user.toJSONString(), MediaType.APPLICATION_JSON);
@@ -767,7 +776,6 @@ public class AccountManagerClient
       return super.majorVersion + "/" + super.minorVersion + "/" + super.bugfixVersion;
     }
   }
-
 
 }
 
