@@ -74,24 +74,66 @@ public class AccountManagerClient
   // Constants ------------------------------------------------------------------------------------
 
 
+  /**
+   * The default root path for the REST API if the remote service has been configured in its
+   * default REST API path '/rest/rpc/accountmanager/[major]/[minor]/[bugfix-version]/' path
+   * (see the remote service's web.xml for servlet path mapping for details).
+   *
+   * TODO : make externally configurable
+   */
   public static final URI REST_ROOT_PATH = URI.create("rest");
 
+  /**
+   * The default REST API path identifying RPC style REST invocations to the remote service
+   * when it has been configured with its default REST API path
+   * '/rest/rpc/accountmanager/[major]/[minor]/[bugfix-version]/'
+   * (see the remote service's web.xml for servlet path mapping for details).
+   *
+   * TODO : make externally configurable
+   */
   public static final URI RPC_REST_PATH = URI.create("rpc");
 
+  /**
+   * The default REST API path identifying the service name of the remote service
+   * when it has been configured with its default REST API path
+   * '/rest/rpc/accountmanager/[major]/[minor]/[bugfix-version]/'
+   * (see the remote service's web.xml for servlet path mapping for details).
+   *
+   * TODO : make externally configurable
+   */
   public static final URI SERVICE_PATH = URI.create("accountmanager");
 
+  /**
+   * Default storage format used for trust store when key certificates not signed by global
+   * certificate authorities are used.
+   */
   public static final KeyManager.Storage DEFAULT_TRUST_STORE_FORMAT = KeyManager.Storage.JCEKS;
 
+  /**
+   * Default key store name used when a private keystore is generated for Tomcat with the tooling
+   * provided by this class.
+   */
   public static final String DEFAULT_PRIVATE_KEYSTORE_FILENAME = "tomcat-private.keystore";
 
+  /**
+   * Default trust store name used when a public key certificate trust store is generated for
+   * the client with the tooling provided by this class.
+   */
   public static final String DEFAULT_TRUSTSTORE_FILENAME = "client.truststore";
 
+  /**
+   * UTF-8 charset used for byte-to-string conversions.
+   */
   public static final Charset UTF8 = Charset.forName("UTF-8");
+
 
 
   // Class Members --------------------------------------------------------------------------------
 
 
+  /**
+   * Account manager client logging.
+   */
   private static final Logger log = Logger.getInstance(Log.CLIENT);
 
 
@@ -181,7 +223,7 @@ public class AccountManagerClient
         new UserRegistration(user, "email@host.domain", "Smb9324$#@#@$".getBytes(UTF8))
     );
 
-    System.out.println(response.getStatus() + ": " + response.getStatusInfo());
+    System.out.println(response.getStatus() + ": - " + response.getStatusInfo());
 
     System.out.println();
     System.out.println("Retrieving account info for user " + user);
@@ -204,7 +246,6 @@ public class AccountManagerClient
 
   private static void generateKeys(String... args) throws KeyManager.KeyManagerException
   {
-
     if (args.length < 2)
     {
       System.err.println("");
@@ -350,6 +391,8 @@ public class AccountManagerClient
 
   public Response create(UserRegistration user)
   {
+
+    
     WebTarget target = constructTargetBase(createClient()).path("users");
 
     Entity<String> jsonEntity = Entity.entity(user.toJSONString(), MediaType.APPLICATION_JSON);
@@ -533,7 +576,7 @@ public class AccountManagerClient
 
 
 
-  private Client createClient()
+  private Client createClient() //throws ClientConfigurationException
   {
     //System.setProperty("javax.net.ssl.trustStore", "/Users/juha/testTrustStore");
 
