@@ -120,6 +120,16 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
       return registration;
     }
 
+    catch (HttpBadRequest exception)
+    {
+      log.error(
+          "Deserializing new user registration failed: {0}",
+          exception, exception.getMessage()
+      );
+
+      throw exception;
+    }
+
     catch (DeserializationException exception)
     {
       log.error(
