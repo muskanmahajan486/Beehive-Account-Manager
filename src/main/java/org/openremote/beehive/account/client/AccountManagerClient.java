@@ -52,8 +52,6 @@ import org.openremote.base.exception.InitializationException;
 import org.openremote.logging.Hierarchy;
 import org.openremote.logging.Logger;
 import org.openremote.security.KeyManager;
-import org.openremote.security.PrivateKeyManager;
-import org.openremote.security.SecurityProvider;
 import org.openremote.security.TrustStore;
 
 import org.openremote.model.User;
@@ -121,18 +119,6 @@ public class AccountManagerClient
   public static final KeyManager.Storage DEFAULT_TRUST_STORE_FORMAT = KeyManager.Storage.JCEKS;
 
   /**
-   * Default key store name used when a private keystore is generated for Tomcat with the tooling
-   * provided by this class.
-   */
-  public static final String DEFAULT_PRIVATE_KEYSTORE_FILENAME = "tomcat-private.keystore";
-
-  /**
-   * Default trust store name used when a public key certificate trust store is generated for
-   * the client with the tooling provided by this class.
-   */
-  public static final String DEFAULT_TRUSTSTORE_FILENAME = "client.truststore";
-
-  /**
    * UTF-8 charset used for byte-to-string conversions.
    */
   public static final Charset UTF8 = Charset.forName("UTF-8");
@@ -150,206 +136,9 @@ public class AccountManagerClient
 
   public static void main(String... args) throws Exception
   {
-    Security.addProvider(SecurityProvider.BC.getProviderInstance());
-
-    if (args.length == 0)
-    {
-      System.err.println("");
-      System.err.println("Use --help argument to list possible arguments for this command.");
-      System.err.println("");
-    }
-
-    if (args[0].equalsIgnoreCase("--generate-keys"))
-    {
-      generateKeys(args);
-    }
-
-    if (args[0].equalsIgnoreCase("--deployment-test"))
-    {
-      executeTestRequests(args);
-    }
-
-    else
-    {
-      System.err.println();
-      System.err.println("Unknown option '" + args[0] + "', use --help for valid options.");
-      System.err.println();
-    }
+    Tools.main(args);
   }
 
-
-  private static void executeTestRequests(String... args) throws Exception
-  {
-    if (args.length < 3)
-    {
-      System.err.println("");
-      System.err.println("Attribute --deployment-test requires additional arguments:");
-      System.err.println("  [--deployment-test <url> <username:password>]");
-      System.err.println("");
-
-      return;
-    }
-
-    String username;
-    String password;
-
-    try
-    {
-      username = args[2].substring(0, args[2].indexOf(":"));
-      password = args[2].substring(args[2].indexOf(":") + 1, args[2].length());
-    }
-
-    catch (IndexOutOfBoundsException e)
-    {
-      System.err.println();
-      System.err.println("Unable to parse <username:password> from '" + args[2] + "'.");
-      System.err.println();
-
-      return;
-    }
-
-    AccountManagerClient client = new AccountManagerClient(
-        new URL(args[1]),
-        username,
-        password.getBytes(UTF8)
-    );
-
-    File userHomeDir = new File(System.getProperty("user.home"));
-    File trustStoreLocation = new File(userHomeDir, "client.truststore");
-
-    client.setCertificateTrustStore(trustStoreLocation.toURI());
-
-    System.out.println("");
-    System.out.println("");
-
-    System.out.println("Executing Deployment Test to " + args[1] + " with user " + username);
-
-    String user = "johndoe";
-
-    System.out.println();
-    System.out.println("Creating new user account for " + user);
-    System.out.println();
-
-    Response response = client.create(
-        new UserRegistration(user, "email@host.domain", "Smb9324$#@#@$".getBytes(UTF8))
-    );
-
-    System.out.println(response.getStatus() + ": - " + response.getStatusInfo());
-
-    System.out.println();
-    System.out.println("Retrieving account info for user " + user);
-    System.out.println();
-
-    response = client.retrieveAccountInfo(user);
-
-    System.out.println(response.getStatus() + ": " + response.getStatusInfo());
-
-    System.out.println();
-    System.out.println("Deleting " + user);
-    System.out.println();
-
-    response = client.delete(user);
-
-    System.out.println(response.getStatus() + ": " + response.getStatusInfo());
-
-  }
-
-
-  private static void generateKeys(String... args) throws KeyManager.KeyManagerException
-  {
-    if (args.length < 2)
-    {
-      System.err.println("");
-      System.err.println("Attribute --generate-keys requires password as second argument.");
-      System.err.println("  [--generate-keys <password> [--alias <alias>]]");
-      System.err.println("");
-
-      return;
-    }
-
-    String alias = "tomcat";
-
-    if (args.length > 2)
-    {
-      if (args[2].equalsIgnoreCase("--alias"))
-      {
-        if (args.length < 4)
-        {
-          System.err.println("");
-          System.err.println("Attribute --alias requires a second argument:");
-          System.err.println("  [--generate-keys <password> [--alias <alias>]]");
-          System.err.println("");
-
-          return;
-        }
-
-        alias = args[3];
-      }
-    }
-
-
-    // Store private key store in current work directory...
-
-    Certificate cert = createPrivateKeyStore(alias, args[1]);
-
-
-    // Store the certificate to a client trust store...
-
-    createClientTrustStore(alias, cert);
-
-    System.out.println();
-    System.out.println("Trusted Tomcat Client Certificate: ");
-    System.out.println();
-
-    System.out.println(cert);
-
-    System.out.println();
-    System.out.println("Tomcat private key store saved to " + DEFAULT_PRIVATE_KEYSTORE_FILENAME);
-    System.out.println("Client trust store saved to " + DEFAULT_TRUSTSTORE_FILENAME);
-
-    System.out.println();
-  }
-
-
-  private static void createClientTrustStore(String alias, Certificate cert)
-      throws KeyManager.KeyManagerException
-  {
-    File workingDirectory = new File(System.getProperty("user.dir"));
-
-    URI trustStoreLocation = new File(workingDirectory, DEFAULT_TRUSTSTORE_FILENAME).toURI();
-
-    TrustStore trustStore = TrustStore.create(trustStoreLocation, DEFAULT_TRUST_STORE_FORMAT);
-
-    trustStore.addTrustedCertificate(alias, cert);
-  }
-
-
-  private static Certificate createPrivateKeyStore(String alias, String password)
-      throws KeyManager.KeyManagerException
-  {
-    File workingDirectory = new File(System.getProperty("user.dir"));
-    URI privateKeyStoreLocation = new File(
-        workingDirectory, DEFAULT_PRIVATE_KEYSTORE_FILENAME
-    ).toURI();
-
-    char[] storePassword = password.toCharArray();
-
-    // Create store and add a new private key...
-
-    PrivateKeyManager privatekey = PrivateKeyManager.create(
-        privateKeyStoreLocation, storePassword, KeyManager.Storage.JCEKS
-    );
-
-    System.out.println();
-    System.out.println("Generating new key for alias '" + alias + "'...");
-    System.out.println();
-
-    // TODO : switch to EC keys...
-
-    return privatekey.addKey(
-        alias, storePassword, KeyManager.AsymmetricKeyAlgorithm.RSA
-    );
-  }
 
 
   // Instance Fields ------------------------------------------------------------------------------
