@@ -28,7 +28,6 @@ import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.Security;
 import java.security.cert.Certificate;
 
 import javax.net.ssl.HostnameVerifier;
