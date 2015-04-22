@@ -65,14 +65,17 @@ import org.openremote.beehive.account.model.UserRegistration;
  * and use of correct media types are handled by this API. <p>
  *
  * For examples on how to directly invoke corresponding operations against the service's HTTP REST
- * API with 'curl', refer to the examples in the documentation.
+ * API with 'curl', refer to the examples in the documentation at http://www.openremote.org/x/vBJoAQ
  *
- * @see #create(org.openremote.model.User)
  * @see #create(org.openremote.beehive.account.model.UserRegistration)
  * @see #create(org.openremote.beehive.account.model.CustomerFulfillment)
  * @see #delete(String)
  *
  * @author Juha Lindfors
+ *
+ *
+ * TODO : document/link to client configuration API above.
+ *
  */
 public class AccountManagerClient
 {
