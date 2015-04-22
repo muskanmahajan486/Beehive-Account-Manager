@@ -30,9 +30,7 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
 import javax.ws.rs.client.Client;
@@ -173,6 +171,8 @@ public class AccountManagerClient
     this.username = username;
     this.credentials = credentials;
   }
+
+
 
 
 
@@ -377,15 +377,7 @@ public class AccountManagerClient
   {
     //System.setProperty("javax.net.ssl.trustStore", "/Users/juha/testTrustStore");
 
-    ClientBuilder builder = ClientBuilder.newBuilder().hostnameVerifier(new HostnameVerifier()
-    {
-      public boolean verify(String s, SSLSession sslSession)
-      {
-        // TODO
-
-        return true;  //To change body of implemented methods use File | Settings | File Templates.
-      }
-    });
+    ClientBuilder builder = ClientBuilder.newBuilder();
 
 
     // set up a null trust manager factory -- if a trust store is not configured in this client
