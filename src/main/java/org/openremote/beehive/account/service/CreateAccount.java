@@ -17,7 +17,6 @@
 package org.openremote.beehive.account.service;
 
 import java.util.Locale;
-//import java.util.logging.Level;
 
 import javax.persistence.EntityManager;
 
@@ -206,30 +205,26 @@ public class CreateAccount
 
   private void addController(Schema schema, RelationalAccount acct, final Controller controller)
   {
-    EntityManager em = getEntityManager();
-
-    switch (schema)
+    if (controller == null)
     {
-      case LEGACY_BEEHIVE:
+      // TODO :
+      //        the ControllerData object where this controller instance is derived from
+      //        does not yet know how to deal with an empty collection of controllers
+      //        in the fullfillment (see the to-do there). So using a null guard here for
+      //        for now, allowing the request to pass but without a controller data in
+      //        the database...
 
-        BeehiveController beehiveCtrl = new BeehiveController(acct, controller);
-
-        em.persist(beehiveCtrl);
-
-        break;
-
-      case ACCOUNT_MANAGER_2_0:
-
-        RelationalController relController = new RelationalController(acct, controller);
-
-        em.persist(relController);
-
-        break;
-
-      default:
-
-        throw new IncorrectImplementationException("Incorrect schema identifier: {0}", schema);
+      return;
     }
+
+    Controller dbController = new RelationalController(acct, controller);
+
+    if (schema == Schema.LEGACY_BEEHIVE)
+    {
+      dbController = new BeehiveController(acct, controller);
+    }
+
+    getEntityManager().persist(dbController);
   }
 
 
@@ -368,11 +363,19 @@ public class CreateAccount
 
   private static class ControllerData extends CustomerFulfillment
   {
+    // TODO:
+    //    set an upper limit on number of allowed controllers and number of allowed
+    //    mac addresses within the controller....
+
     private Controller controller = null;
 
     ControllerData(CustomerFulfillment copy)
     {
       super(copy);
+
+
+      // TODO : what to do if controllers are empty - deal with the null ref here?
+
 
       if (!super.controllers.isEmpty())
       {
