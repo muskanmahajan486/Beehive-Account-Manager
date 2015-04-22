@@ -67,18 +67,28 @@ public class CreateAccount
 
   public static final String WEBAPP_PARAM_SERVICE_DB_SCHEMA = "ServiceSchema";
 
+  /**
+   * Log category for the account registration requests.
+   */
   private static final AccountManager.Log LOG_CATEGORY = AccountManager.Log.REGISTRATION;
 
 
 
   // Class Members --------------------------------------------------------------------------------
 
+  /**
+   * Logger for this account registration implementation.
+   */
   private static Logger log = Logger.getInstance(LOG_CATEGORY);
 
 
 
   // Instance Fields ------------------------------------------------------------------------------
 
+  /**
+   * Security context associated with the incoming HTTP request provided by the host HTTP servlet
+   * service.
+   */
   @Context private SecurityContext security;
 
   @Context private HttpServletRequest request;
