@@ -159,15 +159,28 @@ public class AccountManagerClientTest
 
   // Admin User Registration Tests ----------------------------------------------------------------
 
+
+  /**
+   * Tests a client with admin credentials creating a new user account using the account manager
+   * user registration object.
+   *
+   * @throws Exception  if test fails
+   */
   @Test public void testAdminCreateUserRegistration() throws Exception
   {
+    // create registration...
+
     UserRegistration registration = new UserRegistration(
         "testAdminCreateUserRegistration-" + UUID.randomUUID().toString(),
         "email@some.com",
         new byte[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' }
     );
 
+    // use admin to create a new user account...
+
     Response response = defaultAdminClient.create(registration);
+
+    // should get HTTP OK...
 
     Assert.assertTrue(
         response.getStatus() == Response.Status.OK.getStatusCode(),
@@ -175,16 +188,30 @@ public class AccountManagerClientTest
     );
   }
 
+  /**
+   * Tests a client with admin credentials creating a new user account using object model
+   * user object with additional credentials attribute.
+   *
+   * @throws Exception  if test fails
+   */
   @Test public void testAdminCreateUserWithExplicitAttributes() throws Exception
   {
+    // create new user instance...
+
     User user = new User(
         "testAdminCreateUserWithExplicitAttributes-" + UUID.randomUUID().toString(),
         "email@some.email.com"
     );
 
+    // add credentials attribute...
+
     user.addAttribute("credentials", "newcredentials1");
 
+    // use admin to create a new user account (with user object)...
+
     Response response = defaultAdminClient.create(user);
+
+    // should get HTTP OK...
 
     Assert.assertTrue(
         response.getStatus() == Response.Status.OK.getStatusCode(),
@@ -193,9 +220,16 @@ public class AccountManagerClientTest
   }
 
 
-
+  /**
+   * Tests a client with admin credentials creating multiple unique user registrations.
+   *
+   * @throws Exception  if test fails
+   */
   @Test public void testAdminCreateMultipleUsers() throws Exception
   {
+    // execute individual registration test multiple times -- will use unique usernames to avoid
+    // name conflicts...
+
     testAdminCreateUserRegistration();
     testAdminCreateUserRegistration();
     testAdminCreateUserRegistration();
@@ -203,22 +237,37 @@ public class AccountManagerClientTest
     testAdminCreateUserRegistration();
   }
 
+  /**
+   * Tests a client with admin credentials attempting to create duplicate user accounts.
+   *
+   * @throws Exception  if test fails
+   */
   @Test public void testAdminCreateDuplicateUser() throws Exception
   {
+    // new user registration instance...
+
     UserRegistration registration = new UserRegistration(
         "testAdminCreateDuplicateUser",
         "email@some.com",
         new byte[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' }
     );
 
+    // register...
+
     Response response = defaultAdminClient.create(registration);
+
+    // should get HTTP OK...
 
     Assert.assertTrue(
         response.getStatus() == Response.Status.OK.getStatusCode(),
         "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
     );
 
+    // try again with same registration data...
+
     response = defaultAdminClient.create(registration);
+
+    // Should get HTTP Conflict response...
 
     Assert.assertTrue(
         response.getStatus() == Response.Status.CONFLICT.getStatusCode(),
@@ -227,18 +276,28 @@ public class AccountManagerClientTest
   }
 
 
-
+  /**
+   * Test creating user accounts when admin user is provided with incorrect credentials.
+   *
+   * @throws Exception  if test fails
+   */
   @Test public void testCreateUserWrongAuthenticationCredentials() throws Exception
   {
+    // set up client instance with incorrect credentials...
+
     AccountManagerClient client = new AccountManagerClient(
         DEFAULT_SERVICE_ROOT, ADMIN_USERNAME, "INCORRECT_ADMIN_PASSWORD".getBytes(Defaults.UTF8)
     );
 
     client.createTemporaryCertificateTrustStore(tomcat.getHttpsCertificate());
 
+    // Attempt to register...
+
     Response response = client.create(
         new UserRegistration("newuser3", null, "newcredentials3".getBytes(Defaults.UTF8))
     );
+
+    // should get HTTP Not Authorized...
 
     Assert.assertTrue(
         response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode(),
