@@ -126,6 +126,13 @@ public class CustomerFulfillment extends UserRegistration
 
   public void add(Controller controller)
   {
+    // don't allow nulls into the set...
+
+    if (controller == null)
+    {
+      return;
+    }
+
     controllers.add(controller);
   }
 
