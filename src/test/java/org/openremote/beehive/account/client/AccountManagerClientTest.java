@@ -305,9 +305,14 @@ public class AccountManagerClientTest
     );
   }
 
-  @Test public void testCreateUserNullEmail() throws Exception
+  @Test public void testCreateUserNoCredentials() throws Exception
   {
-    defaultAdminClient.create(new User(UUID.randomUUID().toString(), null));
+    Response response = defaultAdminClient.create(new User(UUID.randomUUID().toString(), "foo@bar.com"));
+
+    Assert.assertTrue(
+        response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode(),
+        "Got " + response.getStatus() + " : " + response.getStatusInfo().getReasonPhrase()
+    );
   }
 
 
