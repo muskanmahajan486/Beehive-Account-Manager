@@ -117,7 +117,7 @@ public class CustomerFulfillmentReader implements MessageBodyReader<CustomerFulf
 
     catch (Exception exception)
     {
-      log.error("Unknown error: " + exception.getMessage());
+      log.error("Unknown error: " + exception.getMessage(), exception);
 
       throw new HttpInternalError(exception, exception.getMessage());
     }

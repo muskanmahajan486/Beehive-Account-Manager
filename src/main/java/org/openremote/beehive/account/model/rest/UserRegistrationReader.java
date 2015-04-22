@@ -142,11 +142,11 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
       );
     }
 
-    catch (Exception e)
+    catch (Exception exception)
     {
-      log.error("Unknown error: " + e.getMessage());
+      log.error("Unknown error: " + exception.getMessage(), exception);
 
-      throw new HttpInternalError(e, e.getMessage());
+      throw new HttpInternalError(exception, exception.getMessage());
     }
   }
 
