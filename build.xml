@@ -248,7 +248,7 @@
           flatten = "true"
           overwrite = "true">
 
-      <fileset dir = "${lib.dir}/openremote-security-0.3.0">
+      <fileset dir = "${lib.dir}/openremote-security-0.3.1">
         <include name = "**/*.jar"/>
         <exclude name = "LICENSE*"/>
       </fileset>
