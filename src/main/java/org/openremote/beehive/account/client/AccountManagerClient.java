@@ -46,8 +46,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.openremote.base.Version;
 import org.openremote.base.exception.InitializationException;
 
-import org.openremote.logging.Hierarchy;
-import org.openremote.logging.Logger;
 import org.openremote.security.KeyManager;
 import org.openremote.security.TrustStore;
 
@@ -55,7 +53,8 @@ import org.openremote.model.User;
 
 import org.openremote.beehive.account.model.CustomerFulfillment;
 import org.openremote.beehive.account.model.UserRegistration;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -131,7 +130,7 @@ public class AccountManagerClient
   /**
    * Account manager client logging.
    */
-  private static final Logger log = Logger.getInstance(Log.CLIENT);
+  private static final Logger log = LoggerFactory.getLogger(Log.CLIENT.getCanonicalLogHierarchyName());
 
 
   public static void main(String... args) throws Exception
@@ -524,7 +523,7 @@ public class AccountManagerClient
   }
 
 
-  public enum Log implements Hierarchy
+  public enum Log
   {
 
     CLIENT("Client");
@@ -537,7 +536,7 @@ public class AccountManagerClient
       this.name = name;
     }
 
-    @Override public String getCanonicalLogHierarchyName()
+    public String getCanonicalLogHierarchyName()
     {
       return "OpenRemote.AccountManager." + name;
     }

@@ -31,8 +31,6 @@ import flexjson.transformer.Transformer;
 import org.openremote.base.Defaults;
 import org.openremote.base.exception.IncorrectImplementationException;
 
-import org.openremote.logging.Logger;
-
 import org.openremote.beehive.account.service.AccountManager;
 
 import org.openremote.model.Controller;
@@ -43,6 +41,8 @@ import org.openremote.model.data.json.JSONHeader;
 import org.openremote.model.data.json.JSONModel;
 import org.openremote.model.data.json.ModelObject;
 import org.openremote.model.data.json.UserTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -64,7 +64,8 @@ public class CustomerFulfillment extends UserRegistration
 
   // Class Members --------------------------------------------------------------------------------
 
-  private static final Logger log = Logger.getInstance(AccountManager.Log.REGISTRATION_DESERIALIZE);
+  private static final Logger log = LoggerFactory.getLogger(
+          AccountManager.Log.REGISTRATION_DESERIALIZE.getCanonicalLogHierarchyName());
 
 
   // Instance Fields ------------------------------------------------------------------------------
@@ -270,7 +271,7 @@ public class CustomerFulfillment extends UserRegistration
         catch (Exception e)
         {
           log.error(
-              "Unrecognized ''{0}'' value ''{1}'' -- falling back to default encoding type: {2}",
+              "Unrecognized ''{}'' value ''{}'' -- falling back to default encoding type: {}",
               User.AUTHMODE_ATTRIBUTE_NAME, authModeProperty, User.CredentialsEncoding.DEFAULT
           );
 

@@ -22,8 +22,8 @@ import java.text.MessageFormat;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.openremote.logging.Hierarchy;
-import org.openremote.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -55,18 +55,18 @@ public class HttpConflict extends WebApplicationException
   }
 
 
-  public HttpConflict(Principal user, Hierarchy category, String message)
+  public HttpConflict(Principal user, String category, String message)
   {
     this(message);
 
-    Logger log = Logger.getInstance(category);
+    Logger log = LoggerFactory.getLogger(category);
 
     // TODO : add configurable level
 
     log.info("[user=" + user.getName() + "] " + message);
   }
 
-  public HttpConflict(Principal user, Hierarchy category, String message, Object... messageParams)
+  public HttpConflict(Principal user, String category, String message, Object... messageParams)
   {
     this(user, category, format(message, messageParams));
   }

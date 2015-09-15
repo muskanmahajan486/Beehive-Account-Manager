@@ -31,8 +31,6 @@ import javax.ws.rs.ext.MessageBodyReader;
 
 import org.openremote.base.Defaults;
 
-import org.openremote.logging.Logger;
-
 import org.openremote.model.User;
 import org.openremote.model.data.json.DeserializationException;
 import org.openremote.model.data.json.UserTransformer;
@@ -41,6 +39,8 @@ import org.openremote.beehive.account.model.UserRegistration;
 import org.openremote.beehive.account.service.AccountManager;
 import org.openremote.beehive.account.service.HttpBadRequest;
 import org.openremote.beehive.account.service.HttpInternalError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -68,7 +68,8 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
 
   // Class Members --------------------------------------------------------------------------------
 
-  private static Logger log = Logger.getInstance(AccountManager.Log.REGISTRATION_DESERIALIZE);
+  private static Logger log = LoggerFactory.getLogger(
+          AccountManager.Log.REGISTRATION_DESERIALIZE.getCanonicalLogHierarchyName());
 
 
 
@@ -113,7 +114,7 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
           user, new User.Authentication(credentials, credsEncoding)
       );
 
-      log.info("Deserialized registration for ''{0}''...", registration.toString());
+      log.info("Deserialized registration for ''{}''...", registration.toString());
 
       // Done...
 
@@ -123,7 +124,7 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
     catch (HttpBadRequest exception)
     {
       log.error(
-          "Deserializing new user registration failed: {0}",
+          "Deserializing new user registration failed: {}",
           exception, exception.getMessage()
       );
 
@@ -133,7 +134,7 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
     catch (DeserializationException exception)
     {
       log.error(
-          "Deserializing new user registration failed: {0}",
+          "Deserializing new user registration failed: {}",
           exception, exception.getMessage()
       );
 
@@ -181,7 +182,7 @@ public class UserRegistrationReader implements MessageBodyReader<UserRegistratio
       catch (Exception e)
       {
         log.error(
-            "Unrecognized ''{0}'' value ''{1}'' -- falling back to default encoding type: {2}",
+            "Unrecognized ''{}'' value ''{}'' -- falling back to default encoding type: {}",
             User.AUTHMODE_ATTRIBUTE_NAME, authModeProperty, User.CredentialsEncoding.DEFAULT
         );
 

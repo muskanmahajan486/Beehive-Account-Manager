@@ -28,14 +28,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 
-import org.openremote.logging.Logger;
-
 import org.openremote.model.data.json.DeserializationException;
 
 import org.openremote.beehive.account.model.CustomerFulfillment;
 import org.openremote.beehive.account.service.AccountManager;
 import org.openremote.beehive.account.service.HttpBadRequest;
 import org.openremote.beehive.account.service.HttpInternalError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -60,7 +60,8 @@ public class CustomerFulfillmentReader implements MessageBodyReader<CustomerFulf
 
   // Class Members --------------------------------------------------------------------------------
 
-  private static Logger log = Logger.getInstance(AccountManager.Log.FULFILLMENT_DESERIALIZE);
+  private static Logger log = LoggerFactory.getLogger(
+          AccountManager.Log.FULFILLMENT_DESERIALIZE.getCanonicalLogHierarchyName());
 
 
 
@@ -95,7 +96,7 @@ public class CustomerFulfillmentReader implements MessageBodyReader<CustomerFulf
     catch (DeserializationException exception)
     {
       log.error(
-          "Deserializing new customer fulfillment failed: {0}",
+          "Deserializing new customer fulfillment failed: {}",
           exception, exception.getMessage()
       );
 
@@ -107,7 +108,7 @@ public class CustomerFulfillmentReader implements MessageBodyReader<CustomerFulf
     catch (ClassCastException exception)
     {
       String msg =
-          "Type mismatch. Was expecting type ''{0}'' but the resulting object from a " +
+          "Type mismatch. Was expecting type ''{}'' but the resulting object from a " +
           "JSON transformer could not be converted to this type.";
 
       log.error(msg, CustomerFulfillment.class.getSimpleName());

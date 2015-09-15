@@ -23,8 +23,8 @@ import java.text.MessageFormat;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.openremote.logging.Hierarchy;
-import org.openremote.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Juha Lindfors
@@ -53,28 +53,28 @@ public class HttpBadRequest extends WebApplicationException
     this(null, message);
   }
 
-  public HttpBadRequest(Principal user, Hierarchy category, Throwable rootCause, String message)
+  public HttpBadRequest(Principal user, String category, Throwable rootCause, String message)
   {
     this (rootCause, message);
 
-    Logger log = Logger.getInstance(category);
+    Logger log = LoggerFactory.getLogger(category);
 
     // TODO : add configurable level
 
     log.info("[user=" + user.getName() + "] " + message);
   }
 
-  public HttpBadRequest(Principal user, Hierarchy category, String message)
+  public HttpBadRequest(Principal user, String category, String message)
   {
     this (user, category, null, message);
   }
 
-  public HttpBadRequest(Principal user, Hierarchy category, String message, Object... messageParams)
+  public HttpBadRequest(Principal user, String category, String message, Object... messageParams)
   {
     this(user, category, format(message, messageParams));
   }
 
-  public HttpBadRequest(Principal user, Hierarchy category, Throwable rootCause,
+  public HttpBadRequest(Principal user, String category, Throwable rootCause,
                         String message, Object... messageParams)
   {
     this(user, category, rootCause, format(message, messageParams));

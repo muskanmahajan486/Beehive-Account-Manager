@@ -35,8 +35,6 @@ import javax.ws.rs.core.SecurityContext;
 import org.openremote.base.Defaults;
 import org.openremote.base.exception.IncorrectImplementationException;
 
-import org.openremote.logging.Logger;
-
 import org.openremote.model.Controller;
 import org.openremote.model.Model;
 import org.openremote.model.User;
@@ -49,6 +47,8 @@ import org.openremote.model.persistence.jpa.beehive.BeehiveUser;
 
 import org.openremote.beehive.account.model.UserRegistration;
 import org.openremote.beehive.account.model.CustomerFulfillment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -79,7 +79,7 @@ public class CreateAccount
   /**
    * Logger for this account registration implementation.
    */
-  private static Logger log = Logger.getInstance(LOG_CATEGORY);
+  private static Logger log = LoggerFactory.getLogger(LOG_CATEGORY.getCanonicalLogHierarchyName());
 
 
 
@@ -106,7 +106,7 @@ public class CreateAccount
     User user = createUserAccount(acct, registration);
 
     log.info(
-        "CREATE ACCOUNT: [Service admin: ''{0}''] created new account for user ''{1}''.",
+        "CREATE ACCOUNT: [Service admin: ''{}''] created new account for user ''{}''.",
         security.getUserPrincipal().getName(), user.getName()
     );
 
@@ -126,7 +126,7 @@ public class CreateAccount
     addController(Schema.resolveDBSchema(webapp), acct, ctrlData.controller);
 
     log.info(
-        "CREATE ACCOUNT: [Service admin: ''{0}''] created new account for user ''{1}''.",
+        "CREATE ACCOUNT: [Service admin: ''{}''] created new account for user ''{}''.",
         security.getUserPrincipal().getName(), user.getName()
     );
 
@@ -157,7 +157,7 @@ public class CreateAccount
       // throw HTTP 500 - Internal Error in case the database save fails...
 
       throw new HttpInternalError(
-          security.getUserPrincipal(), LOG_CATEGORY, exception,
+          security.getUserPrincipal(), LOG_CATEGORY.getCanonicalLogHierarchyName(), exception,
           "Account creation FAILED: {0}",
           exception.getMessage()
       );
@@ -174,7 +174,7 @@ public class CreateAccount
     if (registration == null)
     {
       throw new HttpBadRequest(
-          security.getUserPrincipal(), LOG_CATEGORY,
+          security.getUserPrincipal(), LOG_CATEGORY.getCanonicalLogHierarchyName(),
           "User registration JSON representation was not correctly deserialized."
       );
     }
@@ -187,7 +187,7 @@ public class CreateAccount
     if (exists(schema, registration.getName()))
     {
       throw new HttpConflict(
-          security.getUserPrincipal(), LOG_CATEGORY,
+          security.getUserPrincipal(), LOG_CATEGORY.getCanonicalLogHierarchyName(),
           "User ''{0}'' already exists.",
           registration.getName()
       );
@@ -204,7 +204,7 @@ public class CreateAccount
       // validated...
 
       throw new HttpBadRequest(
-          security.getUserPrincipal(), LOG_CATEGORY, exception,
+          security.getUserPrincipal(), LOG_CATEGORY.getCanonicalLogHierarchyName(), exception,
           "Incorrect user data: {0}",
           exception.getMessage()
       );
@@ -260,7 +260,7 @@ public class CreateAccount
       // throw HTTP 500 - Internal Error in case the database operation fails...
 
       throw new HttpInternalError(
-          security.getUserPrincipal(), LOG_CATEGORY, exception,
+          security.getUserPrincipal(), LOG_CATEGORY.getCanonicalLogHierarchyName(), exception,
           "Error in checking duplicate usernames: {0}",
           exception.getMessage()
       );
@@ -315,7 +315,7 @@ public class CreateAccount
       // throw HTTP 500 - Internal Error in case the database save fails...
 
       throw new HttpInternalError(
-          security.getUserPrincipal(), LOG_CATEGORY, exception,
+          security.getUserPrincipal(), LOG_CATEGORY.getCanonicalLogHierarchyName(), exception,
           "Account creation FAILED: {0}", exception.getMessage()
       );
     }

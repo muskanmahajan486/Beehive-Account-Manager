@@ -31,8 +31,6 @@ import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.openremote.logging.Hierarchy;
-
 import org.openremote.beehive.account.model.rest.CustomerFulfillmentReader;
 import org.openremote.beehive.account.model.rest.UserRegistrationReader;
 
@@ -184,7 +182,7 @@ public class AccountManager extends Application
     }
   }
 
-  public enum Log implements Hierarchy
+  public enum Log
   {
     TRANSACTION               ("Transaction"),
 
@@ -202,7 +200,7 @@ public class AccountManager extends Application
       this.name = name;
     }
 
-    @Override public String getCanonicalLogHierarchyName()
+    public String getCanonicalLogHierarchyName()
     {
       return "OpenRemote.AccountManager." + name;
     }

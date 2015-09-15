@@ -3,7 +3,8 @@
  */
 package org.openremote.beehive.account.service;
 
-import org.openremote.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -35,7 +36,8 @@ public class EntityTransactionFilter implements Filter
 
   public static final String PERSISTENCE_CONTEXT_NAME_CONFIGURATION = "PersistenceContext";
 
-  private static Logger log = Logger.getInstance(AccountManager.Log.TRANSACTION);
+  private static Logger log = LoggerFactory.getLogger(
+          AccountManager.Log.TRANSACTION.getCanonicalLogHierarchyName());
 
 
   // Instance Fields ------------------------------------------------------------------------------
@@ -115,7 +117,7 @@ public class EntityTransactionFilter implements Filter
       tx.begin();
 
       log.info(
-          "Started transaction for user ''{0}'', request ''{1} {2}''...",
+          "Started transaction for user ''{}'', request ''{} {}''...",
           user, request.getMethod(), request.getServletPath() + request.getPathInfo()
       );
 
@@ -129,7 +131,7 @@ public class EntityTransactionFilter implements Filter
         tx.setRollbackOnly();
       }
 
-      log.error("Request failed, tx marked for rollback : {0}", cause, cause.getMessage());
+      log.error("Request failed, tx marked for rollback : {}", cause, cause.getMessage());
     }
 
     finally
@@ -141,7 +143,7 @@ public class EntityTransactionFilter implements Filter
           tx.rollback();
 
           log.info(
-              "ROLLBACK: tx for user ''{0}'' was marked for roll back. Request : ''{1} {2}''",
+              "ROLLBACK: tx for user ''{}'' was marked for roll back. Request : ''{} {}''",
               user, request.getMethod(), request.getServletPath() + request.getPathInfo()
           );
         }
@@ -151,7 +153,7 @@ public class EntityTransactionFilter implements Filter
           tx.rollback();
 
           log.info(
-              "ROLLBACK: error response ''{0} : {1}'' to user ''{2}'' request ''{3} {4}''.",
+              "ROLLBACK: error response ''{} : {}'' to user ''{}'' request ''{} {}''.",
               response.status, response.statusMsg,
               user, request.getMethod(), request.getServletPath() + request.getPathInfo()
           );
@@ -162,7 +164,7 @@ public class EntityTransactionFilter implements Filter
           tx.commit();
 
           log.info(
-              "COMMIT: user ''{0}'' request ''{1} {2}''",
+              "COMMIT: user ''{}'' request ''{} {}''",
               user, request.getMethod(), request.getServletPath() + request.getPathInfo()
           );
         }

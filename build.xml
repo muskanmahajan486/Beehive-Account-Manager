@@ -253,7 +253,7 @@
         <exclude name = "LICENSE*"/>
       </fileset>
 
-      <fileset dir = "${lib.dir}/openremote-logging-0.1.0">
+      <fileset dir = "${lib.dir}/slf4j-1.7.12">
         <include name = "**/*.jar"/>
         <exclude name = "LICENSE*"/>
       </fileset>

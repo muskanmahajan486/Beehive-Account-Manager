@@ -22,8 +22,8 @@ import java.text.MessageFormat;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.openremote.logging.Hierarchy;
-import org.openremote.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -53,11 +53,11 @@ public class HttpInternalError extends WebApplicationException
     this(null, message);
   }
 
-  public HttpInternalError(Principal user, Hierarchy category, Throwable rootCause, String message)
+  public HttpInternalError(Principal user, String category, Throwable rootCause, String message)
   {
     this(rootCause, message);
 
-    Logger log = Logger.getInstance(category);
+    Logger log = LoggerFactory.getLogger(category);
 
     // TODO : add configurable level
 
@@ -65,12 +65,12 @@ public class HttpInternalError extends WebApplicationException
   }
 
 
-  public HttpInternalError(Principal user, Hierarchy category, String message)
+  public HttpInternalError(Principal user, String category, String message)
   {
     this(user, category, null, message);
   }
 
-  public HttpInternalError(Principal user, Hierarchy category, String message, Object... messageParams)
+  public HttpInternalError(Principal user, String category, String message, Object... messageParams)
   {
     this(user, category, format(message, messageParams));
   }
@@ -80,7 +80,7 @@ public class HttpInternalError extends WebApplicationException
     this(format(message, params));
   }
 
-  public HttpInternalError(Principal user, Hierarchy category, Throwable rootCause,
+  public HttpInternalError(Principal user, String category, Throwable rootCause,
                            String message, Object... messageParams)
   {
     this(user, category, rootCause, format(message, messageParams));
