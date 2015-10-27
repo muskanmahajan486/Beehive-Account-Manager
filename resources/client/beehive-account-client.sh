@@ -73,6 +73,9 @@ CLASSPATH=BeehiveAccountClient-2.0.0.jar
 CLASSPATH="$CLASSPATH:lib/object-model-0.2.0_WIP.jar"
 CLASSPATH="$CLASSPATH:lib/openremote-security-0.3.1.jar"
 
+# Logging
+CLASSPATH="$CLASSPATH:lib/slf4j-api-1.7.12.jar"
+
 # FlexJSON lib for JSON processing
 CLASSPATH="$CLASSPATH:lib/flexjson-3.2.jar"
 
