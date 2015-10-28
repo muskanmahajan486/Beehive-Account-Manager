@@ -1,5 +1,6 @@
 /*
- * Copyright 2013-2015, Juha Lindfors. All rights reserved.
+ * OpenRemote, the Home of the Digital Home.
+ * Copyright 2008-2015, OpenRemote Inc.
  *
  * See the contributors.txt file in the distribution for a
  * full listing of individual contributors.
