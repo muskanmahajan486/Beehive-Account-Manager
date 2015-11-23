@@ -158,7 +158,7 @@ public class AccountManager extends Application
     }
   }
 
-  private enum Role
+  public enum Role
   {
     SERVICE_ADMINISTRATOR_ROLE("service-admin"),
 
