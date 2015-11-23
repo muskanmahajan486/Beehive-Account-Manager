@@ -121,9 +121,10 @@ public class CustomerFulfillment extends UserRegistration
   @Override public String toJSONString()
   {
     Map<Class<?>, Transformer> transformers = new HashMap<Class<?>, Transformer>();
+    transformers.put(CustomerFulfillment.class, jsonTransformer);
     transformers.put(Controller.class, new ControllerTransformer());
 
-    return JSONHeader.toJSON(this, JSON_SCHEMA_VERSION, jsonTransformer, transformers);
+    return JSONHeader.toJSON(this, CustomerFulfillment.class.getName(), JSON_SCHEMA_VERSION, transformers);
   }
 
 
@@ -178,7 +179,7 @@ public class CustomerFulfillment extends UserRegistration
               ctrl, Controller.JSON_SCHEMA_VERSION
           );
 
-          json.excludeLibraryNameHeader(true);
+          // json.excludeLibraryNameHeader(true);
 
           jsonControllers.add(json);
         }
