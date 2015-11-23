@@ -20,25 +20,10 @@
  */
 package org.openremote.beehive.account.service;
 
-import java.util.Locale;
-
-import javax.persistence.EntityManager;
-
-import javax.persistence.PersistenceException;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-
 import org.openremote.base.Defaults;
 import org.openremote.base.exception.IncorrectImplementationException;
-
+import org.openremote.beehive.account.model.CustomerFulfillment;
+import org.openremote.beehive.account.model.UserRegistration;
 import org.openremote.model.Controller;
 import org.openremote.model.Model;
 import org.openremote.model.User;
@@ -48,11 +33,23 @@ import org.openremote.model.persistence.jpa.RelationalController;
 import org.openremote.model.persistence.jpa.RelationalUser;
 import org.openremote.model.persistence.jpa.beehive.BeehiveController;
 import org.openremote.model.persistence.jpa.beehive.BeehiveUser;
-
-import org.openremote.beehive.account.model.UserRegistration;
-import org.openremote.beehive.account.model.CustomerFulfillment;
+import org.openremote.model.persistence.jpa.beehive.MinimalBeehiveRole;
+import org.openremote.model.persistence.jpa.beehive.MinimalBeehiveUserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+import java.util.Locale;
 
 
 /**
@@ -295,6 +292,13 @@ public class CreateAccount
           em.persist(acct);   // TODO : not needed?
           em.persist(beehiveUser);
 
+          MinimalBeehiveRole accountOwnerRole = getAccountOwnerRole();
+          if (accountOwnerRole != null)
+          {
+            MinimalBeehiveUserRole userRoleJoin = new MinimalBeehiveUserRole(beehiveUser.getId(), accountOwnerRole.getId());
+            em.persist(userRoleJoin);
+          }
+
           return beehiveUser;
 
         case ACCOUNT_MANAGER_2_0:
@@ -320,11 +324,25 @@ public class CreateAccount
 
       throw new HttpInternalError(
           security.getUserPrincipal(), LOG_CATEGORY.getCanonicalLogHierarchyName(), exception,
-          "Account creation FAILED: {0}", exception.getMessage()
+              "Account creation FAILED: {0}", exception.getMessage()
       );
     }
   }
 
+  private MinimalBeehiveRole getAccountOwnerRole()
+  {
+    try
+    {
+      return (MinimalBeehiveRole) getEntityManager()
+              .createNamedQuery("findRoleByName")
+              .setParameter("roleName", AccountManager.Role.ACCOUNT_OWNER_ROLE.toString()).getSingleResult();
+    }
+    catch (Exception e)
+    {
+      log.warn("Could not find account-owner role", e);
+    }
+    return null;
+  }
 
 
   private EntityManager getEntityManager()

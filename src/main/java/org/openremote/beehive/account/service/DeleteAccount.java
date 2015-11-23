@@ -20,6 +20,9 @@
  */
 package org.openremote.beehive.account.service;
 
+import org.openremote.model.persistence.jpa.RelationalUser;
+import org.openremote.model.persistence.jpa.beehive.MinimalBeehiveUserRole;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -100,6 +103,19 @@ public class DeleteAccount
         // TODO : align with other exception types
 
         throw new NotFoundException("Username was not found.");
+      }
+
+      if (schema == CreateAccount.Schema.LEGACY_BEEHIVE)
+      {
+        // Delete all joins to roles
+        RelationalUser user = (RelationalUser) results.get(0);
+        List<MinimalBeehiveUserRole> roleJoins = entityManager.createNamedQuery("findRolesForUser")
+                .setParameter("userId", user.getId())
+                .getResultList();
+        for (MinimalBeehiveUserRole roleJoin : roleJoins)
+        {
+          entityManager.remove(roleJoin);
+        }
       }
 
       entityManager.remove(results.get(0));
