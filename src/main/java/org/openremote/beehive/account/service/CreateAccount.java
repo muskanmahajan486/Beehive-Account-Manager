@@ -111,7 +111,7 @@ public class CreateAccount
         security.getUserPrincipal().getName(), user.getName()
     );
 
-    return Response.ok().build();
+    return Response.ok(user).build();
   }
 
 
@@ -131,7 +131,7 @@ public class CreateAccount
         security.getUserPrincipal().getName(), user.getName()
     );
 
-    return Response.ok().build();
+    return Response.ok(user).build();
   }
 
 
