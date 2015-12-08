@@ -50,6 +50,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.openremote.base.Version;
 import org.openremote.base.exception.InitializationException;
 
+import org.openremote.beehive.account.model.rest.UserRegistrationReader;
 import org.openremote.security.KeyManager;
 import org.openremote.security.TrustStore;
 
@@ -441,7 +442,9 @@ public class AccountManagerClient
       );
     }
 
-    return builder.build();
+    Client client = builder.build();
+    client.register(UserRegistrationReader.class);
+    return client;
   }
 
   private SSLContext selectHttpsProtocol()
