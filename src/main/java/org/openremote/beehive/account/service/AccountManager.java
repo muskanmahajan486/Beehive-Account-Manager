@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.openremote.beehive.account.model.rest.CustomerFulfillmentReader;
+import org.openremote.beehive.account.model.rest.CustomerFulfillmentWriter;
 import org.openremote.beehive.account.model.rest.UserRegistrationReader;
 import org.openremote.beehive.account.model.rest.UserWriter;
 
@@ -77,6 +78,7 @@ public class AccountManager extends Application
     providerClasses.add(UserRegistrationReader.class);
     providerClasses.add(CustomerFulfillmentReader.class);
     providerClasses.add(UserWriter.class);
+    providerClasses.add(CustomerFulfillmentWriter.class);
   }
 
 

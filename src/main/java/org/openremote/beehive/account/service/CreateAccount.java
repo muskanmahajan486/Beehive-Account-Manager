@@ -49,6 +49,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 
@@ -124,14 +125,30 @@ public class CreateAccount
 
     ControllerData ctrlData = new ControllerData(fulfillment);
 
-    addController(Schema.resolveDBSchema(webapp), acct, ctrlData.controller);
+    Controller addedController = addController(Schema.resolveDBSchema(webapp), acct, ctrlData.controller);
 
     log.info(
         "CREATE ACCOUNT: [Service admin: ''{}''] created new account for user ''{}''.",
         security.getUserPrincipal().getName(), user.getName()
     );
 
-    return Response.ok(user).build();
+    CustomerFulfillment createdFulfillment = null;
+    try
+    {
+      UserRegistration reg = new UserRegistration(user,
+        new User.Authentication("<not provided>".getBytes("UTF-8"), User.CredentialsEncoding.UNSPECIFIED));
+      createdFulfillment = new CustomerFulfillment(reg, addedController);
+      createdFulfillment.getAccounts().add(acct);
+    } catch (UnsupportedEncodingException exception)
+    {
+      throw new HttpInternalError(
+              security.getUserPrincipal(), LOG_CATEGORY.getCanonicalLogHierarchyName(), exception,
+              "Account creation FAILED: {0}",
+              exception.getMessage()
+      );
+    }
+
+    return Response.ok(createdFulfillment).build();
   }
 
 
@@ -214,7 +231,7 @@ public class CreateAccount
 
 
 
-  private void addController(Schema schema, RelationalAccount acct, final Controller controller)
+  private Controller addController(Schema schema, RelationalAccount acct, final Controller controller)
   {
     if (controller == null)
     {
@@ -225,7 +242,7 @@ public class CreateAccount
       //        for now, allowing the request to pass but without a controller data in
       //        the database...
 
-      return;
+      return null;
     }
 
     Controller dbController = new RelationalController(acct, controller);
@@ -236,6 +253,8 @@ public class CreateAccount
     }
 
     getEntityManager().persist(dbController);
+
+    return dbController;
   }
 
 

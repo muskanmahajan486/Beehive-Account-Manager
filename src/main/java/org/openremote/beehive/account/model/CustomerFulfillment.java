@@ -102,7 +102,7 @@ public class CustomerFulfillment extends UserRegistration
   }
 
 
-  private CustomerFulfillment(UserRegistration registration, Controller controller)
+  public CustomerFulfillment(UserRegistration registration, Controller controller)
   {
     super(registration);
 
