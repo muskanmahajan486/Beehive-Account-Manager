@@ -20,7 +20,10 @@
  */
 package org.openremote.beehive.account.service;
 
+import org.openremote.model.persistence.jpa.RelationalController;
 import org.openremote.model.persistence.jpa.RelationalUser;
+import org.openremote.model.persistence.jpa.beehive.BeehiveController;
+import org.openremote.model.persistence.jpa.beehive.BeehiveUser;
 import org.openremote.model.persistence.jpa.beehive.MinimalBeehiveUserRole;
 
 import java.util.List;
@@ -28,6 +31,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -116,7 +122,15 @@ public class DeleteAccount
         {
           entityManager.remove(roleJoin);
         }
+        List<BeehiveController> controllers = entityManager.createNamedQuery("findControllersForAccount")
+                .setParameter("account", ((BeehiveUser)user).getAccount())
+                .getResultList();
+        for (BeehiveController controller : controllers)
+        {
+          entityManager.remove(controller);
+        }
       }
+
 
       entityManager.remove(results.get(0));
     }
