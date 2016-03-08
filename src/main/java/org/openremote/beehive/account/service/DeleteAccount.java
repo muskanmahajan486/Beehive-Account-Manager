@@ -20,25 +20,16 @@
  */
 package org.openremote.beehive.account.service;
 
-import org.openremote.model.persistence.jpa.RelationalController;
 import org.openremote.model.persistence.jpa.RelationalUser;
 import org.openremote.model.persistence.jpa.beehive.BeehiveController;
 import org.openremote.model.persistence.jpa.beehive.BeehiveUser;
 import org.openremote.model.persistence.jpa.beehive.MinimalBeehiveUserRole;
 
-import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-
 import javax.validation.constraints.NotNull;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
@@ -48,6 +39,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.util.List;
 
 
 /**
