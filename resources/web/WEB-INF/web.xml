@@ -91,7 +91,7 @@
     </description>
 
     <filter-name>Transaction Management</filter-name>
-    <filter-class>org.openremote.beehive.account.service.EntityTransactionFilter</filter-class>
+    <filter-class>org.openremote.beehive.EntityTransactionFilter</filter-class>
 
     <!--
      | Name of the persistence context used in the transaction management filter.
