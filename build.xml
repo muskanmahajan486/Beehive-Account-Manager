@@ -266,8 +266,8 @@
         <exclude name = "LICENSE*"/>
       </fileset>
 
-      <fileset dir = "${lib.dir}/object-model-0.2.1">
-        <include name = "**/object-model-0.2.1.jar"/>
+      <fileset dir = "${lib.dir}/object-model-0.2.2">
+        <include name = "**/object-model-0.2.2.jar"/>
         <exclude name = "LICENSE*"/>
       </fileset>
 
